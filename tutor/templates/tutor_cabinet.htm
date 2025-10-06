@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет репетитора</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>🎓 Кабинет репетитора</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <div class="header-info">
+                <h1>Добро пожаловать в кабинет репетитора!</h1>
+                <h2>Управление учениками и расписанием</h2>
+                <p class="subtitle">Здесь вы можете создавать учеников, управлять расписанием и отслеживать прогресс</p>
+            </div>
+        </header>
+
+        <section class="course-info">
+            <h2>👥 Управление учениками</h2>
+            <div class="course-grid">
+                <div class="course-card">
+                    <h3>Мои ученики</h3>
+                    <p>Просмотр списка всех ваших учеников</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('students')">
+                        Посмотреть список
+                    </button>
+                </div>
+                <div class="course-card">
+                    <h3>Создать ученика</h3>
+                    <p>Добавить нового ученика в систему</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('create-student')">
+                        Создать ученика
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="course-info">
+            <h2>📅 Расписание</h2>
+            <div class="course-grid">
+                <div class="course-card">
+                    <h3>Мое расписание</h3>
+                    <p>Просмотр вашего расписания занятий</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('schedule')">
+                        Посмотреть расписание
+                    </button>
+                </div>
+                <div class="course-card">
+                    <h3>Создать занятие</h3>
+                    <p>Добавить новое занятие в расписание</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('create-lesson')">
+                        Создать занятие
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-section" id="content-section">
+            <h2>🎯 Быстрый старт</h2>
+            <div class="login-container">
+                <p>Выберите действие в меню выше чтобы начать работу.</p>
+                <p>Для начала рекомендуется создать ученика и настроить расписание.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function showSection(section) {
+            const contentSection = document.getElementById('content-section');
+            const sections = {
+                'students': `
+                    <h2>👥 Мои ученики</h2>
+                    <div class="login-container">
+                        <p>Здесь будет список ваших учеников</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `,
+                'create-student': `
+                    <h2>➕ Создать ученика</h2>
+                    <div class="login-container">
+                        <form class="login-form" onsubmit="createStudent(event)">
+                            <div class="form-group">
+                                <label>Логин ученика:</label>
+                                <input type="text" id="studentUsername" placeholder="Придумайте логин" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Пароль:</label>
+                                <input type="password" id="studentPassword" placeholder="Придумайте пароль" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Имя:</label>
+                                <input type="text" id="studentFirstName" placeholder="Введите имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Фамилия:</label>
+                                <input type="text" id="studentLastName" placeholder="Введите фамилию" required>
+                            </div>
+                            <button type="submit" class="login-btn">Создать ученика</button>
+                        </form>
+                    </div>
+                `,
+                'schedule': `
+                    <h2>📅 Мое расписание</h2>
+                    <div class="login-container">
+                        <p>Здесь будет ваше расписание занятий</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `,
+                'create-lesson': `
+                    <h2>➕ Создать занятие</h2>
+                    <div class="login-container">
+                        <p>Здесь будет форма создания занятия</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `
+            };
+
+            contentSection.innerHTML = sections[section] || `
+                <h2>Раздел в разработке</h2>
+                <div class="login-container">
+                    <p>Данный раздел находится в разработке.</p>
+                </div>
+            `;
+        }
+
+        async function createStudent(event) {
+            event.preventDefault();
+            alert('Функция создания ученика будет реализована в ближайшее время!');
+        }
+
+        // Проверяем авторизацию при загрузке
+        fetch('/api/check-auth')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.authenticated) {
+                    window.location.href = '/cabinet';
+                }
+            });
+    </script>
+</body>
+</html>
