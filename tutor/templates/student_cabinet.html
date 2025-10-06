@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет ученика</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>📚 Кабинет ученика</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <div class="header-info">
+                <h1>Добро пожаловать в кабинет ученика!</h1>
+                <h2>Обучение и прогресс</h2>
+                <p class="subtitle">Здесь вы можете просматривать расписание, домашние задания и свой прогресс</p>
+            </div>
+        </header>
+
+        <section class="course-info">
+            <h2>📚 Моё обучение</h2>
+            <div class="course-grid">
+                <div class="course-card">
+                    <h3>Моё расписание</h3>
+                    <p>Просмотр вашего расписания занятий</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('schedule')">
+                        Посмотреть расписание
+                    </button>
+                </div>
+                <div class="course-card">
+                    <h3>Домашние задания</h3>
+                    <p>Просмотр и выполнение домашних заданий</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('homework')">
+                        Посмотреть задания
+                    </button>
+                </div>
+                <div class="course-card">
+                    <h3>Мой прогресс</h3>
+                    <p>Отслеживание вашего прогресса в обучении</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('progress')">
+                        Посмотреть прогресс
+                    </button>
+                </div>
+                <div class="course-card">
+                    <h3>Учебные материалы</h3>
+                    <p>Доступ к учебным материалам и ресурсам</p>
+                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('materials')">
+                        Посмотреть материалы
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-section" id="content-section">
+            <h2>🎯 Начало работы</h2>
+            <div class="login-container">
+                <p>Выберите раздел в меню выше чтобы начать работу.</p>
+                <p>Здесь вы можете управлять своим обучением и отслеживать прогресс.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function showSection(section) {
+            const contentSection = document.getElementById('content-section');
+            const sections = {
+                'schedule': `
+                    <h2>📅 Моё расписание</h2>
+                    <div class="login-container">
+                        <p>Здесь будет ваше расписание занятий</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `,
+                'homework': `
+                    <h2>📝 Домашние задания</h2>
+                    <div class="login-container">
+                        <p>Здесь будут ваши домашние задания</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `,
+                'progress': `
+                    <h2>📊 Мой прогресс</h2>
+                    <div class="login-container">
+                        <p>Здесь будет информация о вашем прогрессе</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `,
+                'materials': `
+                    <h2>📁 Учебные материалы</h2>
+                    <div class="login-container">
+                        <p>Здесь будут учебные материалы</p>
+                        <p>Функционал в разработке...</p>
+                    </div>
+                `
+            };
+
+            contentSection.innerHTML = sections[section] || `
+                <h2>Раздел в разработке</h2>
+                <div class="login-container">
+                    <p>Данный раздел находится в разработке.</p>
+                </div>
+            `;
+        }
+
+        // Проверяем авторизацию при загрузке
+        fetch('/api/check-auth')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.authenticated || data.user.role !== 'student') {
+                    window.location.href = '/cabinet';
+                }
+            });
+    </script>
+</body>
+</html>
