@@ -235,6 +235,7 @@ def debug_db():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/tutor-cabinet')
+
 def tutor_cabinet():
     if 'user_id' not in session or session['role'] != 'tutor':
         return "Доступ запрещен. Только для репетиторов.", 403
@@ -340,6 +341,11 @@ def student_cabinet():
         </body>
         </html>
         """
+
+@app.route('/tests')
+#тесты
+def tests():
+    return render_template('tests.html')
 
 @app.route('/')
 def index():
