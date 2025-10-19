@@ -347,6 +347,11 @@ def student_cabinet():
 def tests():
     return render_template('tests.html')
 
+@app.route('/timetable')
+#расписание
+def timetable():
+    return render_template('timetable.html')
+
 @app.route('/')
 def index():
     """Главная страница с React приложением"""
@@ -386,6 +391,13 @@ def serve_cabinet_js():
 def serve_cabinet_index_js():
     """Обслуживание cabinet-index.js"""
     return send_file('cabinet-index.js', mimetype='application/javascript')
+
+@app.route('/students')
+def students():
+    """Страница управления учениками"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+    return render_template('students.html')
 
 if __name__ == '__main__':
     print("🚀 Flask сервер запущен!")

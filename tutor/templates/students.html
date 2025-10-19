@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ученики - Tutor Plus</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/static/css/students.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>🎓 Кабинет репетитора</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="/tutor-cabinet" class="menu-link">📊 Обзор</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/timetable" class="menu-link">📅 Расписание</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/materials" class="menu-link">📚 Материалы</a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="/students" class="menu-link">👥 Ученики</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/requests" class="menu-link">🔄 Запросы на перенос</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/income" class="menu-link">💰 Доходы</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <!-- Страница: Ученики -->
+                <div id="students-page" class="page-section active">
+                    <header class="header">
+                        <div class="header-info">
+                            <h1>👥 Управление учениками</h1>
+                            <h2>Добавление и редактирование информации об учениках</h2>
+                            <p class="subtitle">Создавайте новые учетные записи, управляйте данными и отслеживайте прогресс</p>
+                        </div>
+                    </header>
+
+                    <!-- Быстрые действия -->
+                    <section class="course-info">
+                        <h2>🎯 Быстрые действия</h2>
+                        <div class="course-grid">
+                            <div class="course-card">
+                                <h3>➕ Добавить ученика</h3>
+                                <p>Создать новую учетную запись ученика</p>
+                                <button class="login-btn" style="margin-top: 15px;" onclick="showAddStudentForm()">
+                                    Создать ученика
+                                </button>
+                            </div>
+                            <div class="course-card">
+                                <h3>📊 Статистика</h3>
+                                <p>Просмотр общей статистики по ученикам</p>
+                                <button class="login-btn" style="margin-top: 15px;" onclick="showStatistics()">
+                                    Посмотреть статистику
+                                </button>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Поиск и фильтры -->
+                    <section class="login-section">
+
+
+                        <!-- Список учеников -->
+                        <div class="students-list-container">
+                            <h3>📋 Список учеников (12)</h3>
+                            <div class="students-grid">
+                                <!-- Ученик 1 -->
+                                <div class="student-card" data-subject="math" data-status="active">
+                                    <div class="student-header">
+                                        <h4>👤 Иванов Алексей</h4>
+                                        <span class="student-status active">Активен</span>
+                                    </div>
+                                    <div class="student-info">
+                                        <p><strong>Логин:</strong> alex_ivanov</p>
+                                        <p><strong>Предмет:</strong> 📐 Математика</p>
+                                        <p><strong>Расписание:</strong> Пн, Ср 14:00-15:30</p>
+                                        <p><strong>Стоимость:</strong> 1,500 ₽/занятие</p>
+                                        <p><strong>Успеваемость:</strong> <span class="progress-value">4.5/5.0</span></p>
+                                    </div>
+                                    <div class="student-actions">
+                                        <button class="action-btn small" onclick="editStudent(1)">✏️</button>
+                                        <button class="action-btn small" onclick="viewProgress(1)">📊</button>
+                                        <button class="action-btn small delete" onclick="deleteStudent(1)">🗑️</button>
+                                    </div>
+                                </div>
+
+                                <!-- Ученик 2 -->
+                                <div class="student-card" data-subject="physics" data-status="active">
+                                    <div class="student-header">
+                                        <h4>👤 Петрова Мария</h4>
+                                        <span class="student-status active">Активна</span>
+                                    </div>
+                                    <div class="student-info">
+                                        <p><strong>Логин:</strong> maria_petrova</p>
+                                        <p><strong>Предмет:</strong> ⚡ Физика</p>
+                                        <p><strong>Расписание:</strong> Вт, Чт 16:00-17:30</p>
+                                        <p><strong>Стоимость:</strong> 1,200 ₽/занятие</p>
+                                        <p><strong>Успеваемость:</strong> <span class="progress-value">4.8/5.0</span></p>
+                                    </div>
+                                    <div class="student-actions">
+                                        <button class="action-btn small" onclick="editStudent(2)">✏️</button>
+                                        <button class="action-btn small" onclick="viewProgress(2)">📊</button>
+                                        <button class="action-btn small delete" onclick="deleteStudent(2)">🗑️</button>
+                                    </div>
+                                </div>
+
+                                <!-- Ученик 3 -->
+                                <div class="student-card" data-subject="math" data-status="active">
+                                    <div class="student-header">
+                                        <h4>👤 Сидоров Дмитрий</h4>
+                                        <span class="student-status active">Активен</span>
+                                    </div>
+                                    <div class="student-info">
+                                        <p><strong>Логин:</strong> dmitry_sidorov</p>
+                                        <p><strong>Предмет:</strong> 📐 Математика</p>
+                                        <p><strong>Расписание:</strong> Пн, Пт 10:00-11:30</p>
+                                        <p><strong>Стоимость:</strong> 1,300 ₽/занятие</p>
+                                        <p><strong>Успеваемость:</strong> <span class="progress-value">4.2/5.0</span></p>
+                                    </div>
+                                    <div class="student-actions">
+                                        <button class="action-btn small" onclick="editStudent(3)">✏️</button>
+                                        <button class="action-btn small" onclick="viewProgress(3)">📊</button>
+                                        <button class="action-btn small delete" onclick="deleteStudent(3)">🗑️</button>
+                                    </div>
+                                </div>
+
+                                <!-- Добавьте остальных 9 учеников по аналогии -->
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления ученика -->
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 Добавить нового ученика</h3>
+                <span class="close" onclick="closeAddStudentForm()">&times;</span>
+            </div>
+            <form class="add-student-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Имя:</label>
+                        <input type="text" name="firstName" placeholder="Введите имя" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия:</label>
+                        <input type="text" name="lastName" placeholder="Введите фамилию" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Логин:</label>
+                        <input type="text" name="username" placeholder="Придумайте логин" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" name="password" placeholder="Придумайте пароль" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Предмет:</label>
+                    <select name="subject" required>
+                        <option value="">Выберите предмет</option>
+                        <option value="math">Математика</option>
+                        <option value="physics">Физика</option>
+                        <option value="chemistry">Химия</option>
+                        <option value="russian">Русский язык</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Стоимость занятия (₽):</label>
+                    <input type="number" name="price" placeholder="1500" min="500" max="10000" required>
+                </div>
+                <div class="form-group">
+                    <label>Контактная информация:</label>
+                    <textarea name="contactInfo" placeholder="Телефон, email, дополнительные контакты..." rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeAddStudentForm()">Отмена</button>
+                    <button type="submit" class="submit-btn">Добавить ученика</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/students.js"></script>
+</body>
+</html>
