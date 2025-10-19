@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет репетитора</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>🎓 Кабинет репетитора</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" onclick="showPage('dashboard')">
+                        📊 Обзор
+                    </li>
+                    <li class="menu-item" onclick="showPage('schedule')">
+                        📅 Расписание
+                    </li>
+                    <li class="menu-item" onclick="showPage('materials')">
+                        📚 Материалы
+                    </li>
+                    <li class="menu-item" onclick="showPage('students')">
+                        👥 Ученики
+                    </li>
+                    <li class="menu-item" onclick="showPage('requests')">
+                        🔄 Запросы на перенос
+                    </li>
+                    <li class="menu-item" onclick="showPage('income')">
+                        💰 Доходы
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <!-- Страница: Обзор -->
+                <div id="dashboard" class="page-section active">
+                    <header class="header">
+                        <div class="photo-section">
+                            <img src="me.jpg" alt="Фото репетитора" class="photo">
+                        </div>
+                        <div class="header-info">
+                            <h1>Добро пожаловать, Мария Степкина!</h1>
+                            <h2>Управление учениками и расписанием</h2>
+                            <p class="subtitle">Здесь вы можете создавать учеников, управлять расписанием и отслеживать прогресс</p>
+                        </div>
+                    </header>
+
+                    <section class="course-info">
+                        <h2>📊 Быстрая статистика</h2>
+                        <div class="course-grid">
+                            <div class="course-card">
+                                <h3>Всего учеников</h3>
+                                <p style="font-size: 2em; color: #88746b; text-align: center; margin: 20px 0;">12</p>
+                                <p>Активных: 10</p>
+                            </div>
+                            <div class="course-card">
+                                <h3>Занятия на неделю</h3>
+                                <p style="font-size: 2em; color: #88746b; text-align: center; margin: 20px 0;">8</p>
+                                <p>Завтра: 2 занятия</p>
+                            </div>
+                            <div class="course-card">
+                                <h3>Доход за месяц</h3>
+                                <p style="font-size: 2em; color: #88746b; text-align: center; margin: 20px 0;">45,000 ₽</p>
+                                <p>Прогноз: 60,000 ₽</p>
+                            </div>
+                        </div>
+                    </section>
+
+
+</body>
+</html>
