@@ -3,8 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кабинет репетитора</title>
+    <title>Расписание - Кабинет репетитора</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .schedule-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .date-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #FEFCF8;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid #88746b;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            color: #FEFCF8;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #6B5B73, #88746b);
+            transform: scale(1.05);
+        }
+
+        .current-date {
+            font-weight: 600;
+            color: #88746b;
+            font-size: 1.2em;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            color: #FEFCF8;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(136, 116, 107, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #88746b;
+            border: 2px solid #88746b;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: rgba(136, 116, 107, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Большая таблица расписания */
+        .daily-schedule {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .daily-schedule::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table thead {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+        }
+
+        .schedule-table th {
+            color: #FEFCF8;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1em;
+            border-right: 1px solid rgba(254, 252, 248, 0.2);
+        }
+
+        .schedule-table th:last-child {
+            border-right: none;
+        }
+
+        .schedule-table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+
+        .schedule-table tbody tr:hover {
+            background: rgba(136, 116, 107, 0.05);
+        }
+
+        .schedule-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-table td {
+            padding: 20px;
+            vertical-align: top;
+        }
+
+        .time-slot {
+            font-weight: 600;
+            color: #88746b;
+            background: rgba(136, 116, 107, 0.05);
+            width: 120px;
+        }
+
+        .lesson-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #88746b;
+            box-shadow: 0 3px 15px rgba(136, 116, 107, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(136, 116, 107, 0.15);
+        }
+
+        .lesson-card.oge {
+            border-left-color: #51cf66;
+        }
+
+        .lesson-card.ege {
+            border-left-color: #339af0;
+        }
+
+        .lesson-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FEFCF8;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .student-details h4 {
+            margin: 0;
+            color: #88746b;
+            font-size: 1.1em;
+        }
+
+        .student-details p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .lesson-type {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background: #88746b;
+            color: #FEFCF8;
+        }
+
+        .lesson-type.oge {
+            background: #51cf66;
+        }
+
+        .lesson-type.ege {
+            background: #339af0;
+        }
+
+        .lesson-details {
+            margin-bottom: 15px;
+        }
+
+        .lesson-topic {
+            font-weight: 600;
+            color: #88746b;
+            margin-bottom: 8px;
+        }
+
+        .lesson-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .lesson-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(81, 207, 102, 0.3);
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #ffd43b, #fab005);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(255, 212, 59, 0.3);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #ff6b6b, #fa5252);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .empty-slot {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .stat-card h3 {
+            color: #88746b;
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #88746b;
+            margin: 0;
+        }
+
+        .stat-description {
+            color: #666;
+            font-size: 0.9em;
+            margin: 10px 0 0 0;
+        }
+
+        @media (max-width: 768px) {
+            .schedule-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .schedule-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .schedule-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .lesson-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .lesson-actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -25,364 +412,349 @@
                     <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
                 </div>
                 <ul class="sidebar-menu">
-                    <li class="menu-item" onclick="showPage('tutor_cabinet')">
-                        📊 Обзор
+                    <li class="menu-item">
+                        <a href="/tutor-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
                     </li>
-                    <li class="menu-item active" onclick="showPage('schedule')">
-                        📅 Расписание
+                    <li class="menu-item active">
+                        <a href="/timetable" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('materials')">
-                        📚 Материалы
+                    <li class="menu-item">
+                        <a href="/materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('students')">
-                        👥 Ученики
+                    <li class="menu-item">
+                        <a href="/students" style="display: block; text-decoration: none; color: inherit;">
+                            👥 Ученики
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('requests')">
-                        🔄 Запросы на перенос
+                    <li class="menu-item">
+                        <a href="/reschedule" style="display: block; text-decoration: none; color: inherit;">
+                            🔄 Запросы на перенос
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('income')">
-                        💰 Доходы
+                    <li class="menu-item">
+                        <a href="/income" style="display: block; text-decoration: none; color: inherit;">
+                            💰 Доходы
+                        </a>
                     </li>
                 </ul>
             </div>
 
             <!-- Основной контент -->
             <div class="content-area">
-                <!-- Страница: Расписание -->
                 <div id="schedule" class="page-section active">
                     <header class="header">
-                        <div class="header-info">
-                            <h1>📅 Расписание занятий</h1>
-                            <h2>Управление вашим расписанием и занятиями</h2>
-                            <p class="subtitle">Просматривайте ближайшие занятия, создавайте новые и управляйте расписанием</p>
-                        </div>
+                        <h1>📅 Расписание занятий</h1>
+                        <p class="subtitle">Управление вашим расписанием и занятиями по информатике ОГЭ/ЕГЭ</p>
                     </header>
 
-                    <!-- Быстрые действия -->
-                    <section class="course-info">
-                        <h2>🎯 Быстрые действия</h2>
-                        <div class="course-grid">
-                            <div class="course-card">
-                                <h3>➕ Провести занятие</h3>
-                                <p>Добавить новое занятие в расписание</p>
-                                <button class="login-btn" style="margin-top: 15px;" onclick="showCreateLessonForm()">
-                                    Провести занятие
-                                </button>
-                            </div>
-
-                            <div class="course-card">
-                                <h3>🔄 Повторяющиеся</h3>
-                                <p>Настроить регулярные занятия</p>
-                                <button class="login-btn" style="margin-top: 15px;" onclick="showRecurringForm()">
-                                    Настроить
-                                </button>
-                            </div>
+                    <section class="schedule-header">
+                        <div class="date-navigation">
+                            <button class="nav-btn" onclick="previousDay()">◀</button>
+                            <div class="current-date" id="currentDate">Понедельник, 20 мая 2024</div>
+                            <button class="nav-btn" onclick="nextDay()">▶</button>
+                        </div>
+                        <div class="schedule-actions">
+                            <button class="btn-primary" onclick="addLesson()">➕ Добавить занятие</button>
+                            <button class="btn-outline" onclick="showWeekView()">📅 Неделя</button>
+                            <button class="btn-outline" onclick="showRecurring()">🔄 Повторяющиеся</button>
                         </div>
                     </section>
 
-                    <!-- Фильтры и представления -->
-                    <section class="login-section">
-                        <div class="schedule-controls">
-                            <div class="view-selector">
-                                <button class="view-btn active" onclick="changeView('day')">День</button>
-                                <button class="view-btn" onclick="changeView('week')">Неделя</button>
-                                <button class="view-btn" onclick="changeView('month')">Месяц</button>
-                            </div>
-                            <div class="date-navigation">
-                                <button class="nav-btn" onclick="previousPeriod()">‹</button>
-                                <span class="current-period" id="currentPeriod">Сегодня, 15 декабря</span>
-                                <button class="nav-btn" onclick="nextPeriod()">›</button>
-                            </div>
-                        </div>
-
-                        <!-- Дневное расписание -->
-                        <div id="dayView" class="schedule-view active">
-                            <h3>📅 Сегодня, 15 декабря</h3>
-                            <div class="daily-schedule">
-                                <div class="time-slot">
-                                    <div class="time-label">09:00 - 10:30</div>
-                                    <div class="lesson-card">
-                                        <div class="lesson-subject">📐 Математика</div>
-                                        <div class="lesson-student">👤 Иванов Алексей</div>
-                                        <div class="lesson-topic">Тема: Квадратные уравнения</div>
+                    <!-- Большая таблица расписания на день -->
+                    <section class="daily-schedule">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">Время</th>
+                                    <th>Занятия</th>
+                                    <th style="width: 150px;">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Утренние занятия -->
+                                <tr>
+                                    <td class="time-slot">09:00 - 10:30</td>
+                                    <td>
+                                        <div class="lesson-card oge">
+                                            <div class="lesson-header">
+                                                <div class="student-info">
+                                                    <div class="student-avatar">АП</div>
+                                                    <div class="student-details">
+                                                        <h4>Алексей Петров</h4>
+                                                        <p>9 класс • ОГЭ</p>
+                                                    </div>
+                                                </div>
+                                                <span class="lesson-type oge">ОГЭ</span>
+                                            </div>
+                                            <div class="lesson-details">
+                                                <div class="lesson-topic">Алгоритмизация и программирование</div>
+                                                <div class="lesson-description">
+                                                    Решение задач на PascalABC. Работа с массивами и строками.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="lesson-actions">
-                                            <button class="action-btn small" onclick="startLesson(1)">Начать</button>
-                                            <button class="action-btn small" onclick="editLesson(1)">✏️</button>
+                                            <button class="btn-small btn-start" onclick="startLesson(1)">🎬 Начать</button>
+                                            <button class="btn-small btn-edit" onclick="editLesson(1)">✏️</button>
                                         </div>
-                                    </div>
-                                </div>
+                                    </td>
+                                </tr>
 
-                                <div class="time-slot">
-                                    <div class="time-label">11:00 - 12:30</div>
-                                    <div class="lesson-card">
-                                        <div class="lesson-subject">⚡ Физика</div>
-                                        <div class="lesson-student">👤 Петрова Мария</div>
-                                        <div class="lesson-topic">Тема: Законы Ньютона</div>
+                                <tr>
+                                    <td class="time-slot">10:30 - 12:00</td>
+                                    <td>
+                                        <div class="lesson-card ege">
+                                            <div class="lesson-header">
+                                                <div class="student-info">
+                                                    <div class="student-avatar">ЕС</div>
+                                                    <div class="student-details">
+                                                        <h4>Елена Сидорова</h4>
+                                                        <p>11 класс • ЕГЭ</p>
+                                                    </div>
+                                                </div>
+                                                <span class="lesson-type ege">ЕГЭ</span>
+                                            </div>
+                                            <div class="lesson-details">
+                                                <div class="lesson-topic">Задачи на системы счисления</div>
+                                                <div class="lesson-description">
+                                                    Перевод между системами счисления. Решение задач №16 из ЕГЭ.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="lesson-actions">
-                                            <button class="action-btn small" onclick="startLesson(2)">Начать</button>
-                                            <button class="action-btn small" onclick="editLesson(2)">✏️</button>
+                                            <button class="btn-small btn-start" onclick="startLesson(2)">🎬 Начать</button>
+                                            <button class="btn-small btn-edit" onclick="editLesson(2)">✏️</button>
                                         </div>
-                                    </div>
-                                </div>
+                                    </td>
+                                </tr>
 
-                                <div class="time-slot free">
-                                    <div class="time-label">14:00 - 15:30</div>
-                                    <div class="free-slot">🕐 Свободное время</div>
-                                </div>
+                                <!-- Обеденный перерыв -->
+                                <tr>
+                                    <td class="time-slot">12:00 - 13:00</td>
+                                    <td>
+                                        <div class="empty-slot">
+                                            🍽️ Обеденный перерыв
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
 
-                                <div class="time-slot">
-                                    <div class="time-label">16:00 - 17:30</div>
-                                    <div class="lesson-card">
-                                        <div class="lesson-subject">📐 Математика</div>
-                                        <div class="lesson-student">👤 Сидоров Дмитрий</div>
-                                        <div class="lesson-topic">Тема: Теорема Пифагора</div>
+                                <!-- Дневные занятия -->
+                                <tr>
+                                    <td class="time-slot">13:00 - 14:30</td>
+                                    <td>
+                                        <div class="lesson-card oge">
+                                            <div class="lesson-header">
+                                                <div class="student-info">
+                                                    <div class="student-avatar">ИК</div>
+                                                    <div class="student-details">
+                                                        <h4>Иван Козлов</h4>
+                                                        <p>9 класс • ОГЭ</p>
+                                                    </div>
+                                                </div>
+                                                <span class="lesson-type oge">ОГЭ</span>
+                                            </div>
+                                            <div class="lesson-details">
+                                                <div class="lesson-topic">Базы данных и SQL</div>
+                                                <div class="lesson-description">
+                                                    Основы реляционных баз данных. Простые SQL-запросы.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="lesson-actions">
-                                            <button class="action-btn small" onclick="startLesson(3)">Начать</button>
-                                            <button class="action-btn small" onclick="editLesson(3)">✏️</button>
+                                            <button class="btn-small btn-start" onclick="startLesson(3)">🎬 Начать</button>
+                                            <button class="btn-small btn-edit" onclick="editLesson(3)">✏️</button>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    </td>
+                                </tr>
 
-                        <!-- Недельное расписание -->
-                        <div id="weekView" class="schedule-view">
-                            <h3>📅 Неделя 15-21 декабря</h3>
-                            <div class="weekly-schedule">
-                                <div class="week-grid">
-                                    <div class="week-day">
-                                        <div class="day-header">Понедельник<br>15 дек</div>
-                                        <div class="day-lessons">
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">14:00-15:30</span>
-                                                <span class="lesson-info">Математика - Алексей</span>
+                                <tr>
+                                    <td class="time-slot">14:30 - 16:00</td>
+                                    <td>
+                                        <div class="empty-slot">
+                                            📝 Подготовка материалов
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+
+                                <!-- Вечерние занятия -->
+                                <tr>
+                                    <td class="time-slot">16:00 - 17:30</td>
+                                    <td>
+                                        <div class="lesson-card ege">
+                                            <div class="lesson-header">
+                                                <div class="student-info">
+                                                    <div class="student-avatar">ОН</div>
+                                                    <div class="student-details">
+                                                        <h4>Ольга Новикова</h4>
+                                                        <p>11 класс • ЕГЭ</p>
+                                                    </div>
+                                                </div>
+                                                <span class="lesson-type ege">ЕГЭ</span>
                                             </div>
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">16:00-17:30</span>
-                                                <span class="lesson-info">Физика - Мария</span>
+                                            <div class="lesson-details">
+                                                <div class="lesson-topic">Динамическое программирование</div>
+                                                <div class="lesson-description">
+                                                    Решение задач на динамику. Подготовка к сложным заданиям ЕГЭ.
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="week-day">
-                                        <div class="day-header">Вторник<br>16 дек</div>
-                                        <div class="day-lessons">
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">10:00-11:30</span>
-                                                <span class="lesson-info">Математика - Дмитрий</span>
+                                    </td>
+                                    <td>
+                                        <div class="lesson-actions">
+                                            <button class="btn-small btn-start" onclick="startLesson(4)">🎬 Начать</button>
+                                            <button class="btn-small btn-edit" onclick="editLesson(4)">✏️</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="time-slot">17:30 - 19:00</td>
+                                    <td>
+                                        <div class="lesson-card oge">
+                                            <div class="lesson-header">
+                                                <div class="student-info">
+                                                    <div class="student-avatar">ДВ</div>
+                                                    <div class="student-details">
+                                                        <h4>Дмитрий Волков</h4>
+                                                        <p>9 класс • ОГЭ</p>
+                                                    </div>
+                                                </div>
+                                                <span class="lesson-type oge">ОГЭ</span>
+                                            </div>
+                                            <div class="lesson-details">
+                                                <div class="lesson-topic">Логика и теория множеств</div>
+                                                <div class="lesson-description">
+                                                    Решение логических задач. Работа с диаграммами Эйлера-Венна.
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="week-day">
-                                        <div class="day-header">Среда<br>17 дек</div>
-                                        <div class="day-lessons">
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">14:00-15:30</span>
-                                                <span class="lesson-info">Математика - Алексей</span>
-                                            </div>
+                                    </td>
+                                    <td>
+                                        <div class="lesson-actions">
+                                            <button class="btn-small btn-start" onclick="startLesson(5)">🎬 Начать</button>
+                                            <button class="btn-small btn-edit" onclick="editLesson(5)">✏️</button>
                                         </div>
-                                    </div>
-                                    <div class="week-day">
-                                        <div class="day-header">Четверг<br>18 дек</div>
-                                        <div class="day-lessons">
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">16:00-17:30</span>
-                                                <span class="lesson-info">Физика - Мария</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="week-day">
-                                        <div class="day-header">Пятница<br>19 дек</div>
-                                        <div class="day-lessons">
-                                            <div class="week-lesson">
-                                                <span class="lesson-time">10:00-11:30</span>
-                                                <span class="lesson-info">Математика - Дмитрий</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </section>
 
-                    <!-- Ближайшие занятия -->
-                    <!-- Ближайшие занятия -->
-<section class="login-section">
-    <h2>🔜 Ученики </h2>
-    <div class="upcoming-lessons">
-        <div class="upcoming-lesson">
-            <div class="lesson-details">
-                <h4>👥 Список учеников для занятий</h4>
-                <p><strong>Всего учеников:</strong> 10</p>
-                <div class="students-list">
-                    <!-- Ученик 1 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Иванов Алексей</span>
-                            <span class="student-subject">📐 Математика - Квадратные уравнения</span>
+                    <!-- Статистика дня -->
+                    <section class="quick-stats">
+                        <div class="stat-card">
+                            <h3>🎯 Занятий сегодня</h3>
+                            <p class="stat-number">5</p>
+                            <p class="stat-description">3 ОГЭ + 2 ЕГЭ</p>
                         </div>
-                        <button class="start-lesson-btn" onclick="startLesson(1, 'Иванов Алексей')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 2 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Петрова Мария</span>
-                            <span class="student-subject">⚡ Физика - Законы Ньютона</span>
+                        <div class="stat-card">
+                            <h3>⏱️ Общее время</h3>
+                            <p class="stat-number">7.5ч</p>
+                            <p class="stat-description">Академических часов</p>
                         </div>
-                        <button class="start-lesson-btn" onclick="startLesson(2, 'Петрова Мария')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 3 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Сидоров Дмитрий</span>
-                            <span class="student-subject">📐 Математика - Теорема Пифагора</span>
+                        <div class="stat-card">
+                            <h3>💰 Прогноз дохода</h3>
+                            <p class="stat-number">7,500₽</p>
+                            <p class="stat-description">За сегодняшний день</p>
                         </div>
-                        <button class="start-lesson-btn" onclick="startLesson(3, 'Сидоров Дмитрий')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 4 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Козлова Анна</span>
-                            <span class="student-subject">🧪 Химия - Органические соединения</span>
+                        <div class="stat-card">
+                            <h3>📚 Материалы</h3>
+                            <p class="stat-number">3</p>
+                            <p class="stat-description">Нужно подготовить</p>
                         </div>
-                        <button class="start-lesson-btn" onclick="startLesson(4, 'Козлова Анна')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 5 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Николаев Иван</span>
-                            <span class="student-subject">💻 Информатика - Алгоритмы</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(5, 'Николаев Иван')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 6 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Смирнова Ольга</span>
-                            <span class="student-subject">📝 Русский язык - Грамматика</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(6, 'Смирнова Ольга')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 7 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Волков Петр</span>
-                            <span class="student-subject">📐 Математика - Производные</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(7, 'Волков Петр')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 8 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Федорова Елена</span>
-                            <span class="student-subject">⚡ Физика - Электричество</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(8, 'Федорова Елена')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 9 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Павлов Артем</span>
-                            <span class="student-subject">💻 Программирование - Python</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(9, 'Павлов Артем')">
-                            Начать урок
-                        </button>
-                    </div>
-
-                    <!-- Ученик 10 -->
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">👤 Орлова Виктория</span>
-                            <span class="student-subject">📝 Литература - Анализ текста</span>
-                        </div>
-                        <button class="start-lesson-btn" onclick="startLesson(10, 'Орлова Виктория')">
-                            Начать урок
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-                   <!-- Ближайшие занятия -->
-
+                    </section>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно создания занятия -->
-    <div id="createLessonModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>➕ Создать новое занятие</h3>
-                <span class="close" onclick="closeCreateLessonForm()">&times;</span>
-            </div>
-            <form class="create-lesson-form">
-                <div class="form-group">
-                    <label>Ученик:</label>
-                    <select name="student" required>
-                        <option value="">Выберите ученика</option>
-                        <option value="1">Иванов Алексей</option>
-                        <option value="2">Петрова Мария</option>
-                        <option value="3">Сидоров Дмитрий</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Предмет:</label>
-                    <select name="subject" required>
-                        <option value="">Выберите предмет</option>
-                        <option value="math">Математика</option>
-                        <option value="physics">Физика</option>
-                        <option value="chemistry">Химия</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Тема занятия:</label>
-                    <input type="text" name="topic" placeholder="Введите тему занятия" required>
-                </div>
-                <div class="form-group">
-                    <label>Дата и время:</label>
-                    <input type="datetime-local" name="datetime" required>
-                </div>
-                <div class="form-group">
-                    <label>Продолжительность (минуты):</label>
-                    <input type="number" name="duration" value="90" min="30" max="180" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" onclick="closeCreateLessonForm()">Отмена</button>
-                    <button type="submit" class="submit-btn">Создать занятие</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <script>
+        // Функция для выделения активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
 
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
 
+            // Установка текущей даты
+            updateCurrentDate();
+        });
 
+        // Навигация по датам
+        let currentDate = new Date();
+
+        function updateCurrentDate() {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = 
+                currentDate.toLocaleDateString('ru-RU', options);
+        }
+
+        function previousDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateCurrentDate();
+            // Здесь будет загрузка расписания на предыдущий день
+        }
+
+        function nextDay() {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateCurrentDate();
+            // Здесь будет загрузка расписания на следующий день
+        }
+
+        // Функции для работы с занятиями
+        function addLesson() {
+            alert('Открытие формы добавления нового занятия');
+            // Здесь будет логика открытия модального окна
+        }
+
+        function startLesson(lessonId) {
+            if (confirm('Начать занятие?')) {
+                alert(`Занятие #${lessonId} начато!`);
+                // Здесь будет логика начала занятия
+            }
+        }
+
+        function editLesson(lessonId) {
+            alert(`Редактирование занятия #${lessonId}`);
+            // Здесь будет логика редактирования занятия
+        }
+
+        function showWeekView() {
+            alert('Переход к просмотру расписания на неделю');
+            // Здесь будет логика перехода к недельному виду
+        }
+
+        function showRecurring() {
+            alert('Настройка повторяющихся занятий');
+            // Здесь будет логика настройки повторяющихся занятий
+        }
+    </script>
 </body>
 </html>
+[file content end]

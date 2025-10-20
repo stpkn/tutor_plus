@@ -234,59 +234,19 @@ def debug_db():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/tutor-cabinet')
 
+@app.route('/tutor-cabinet')
 def tutor_cabinet():
     if 'user_id' not in session or session['role'] != 'tutor':
         return "Доступ запрещен. Только для репетиторов.", 403
 
+    print(f"🔄 Рендеринг tutor_cabinet.html для пользователя {session.get('username')}")
+
     try:
-        with open('templates/tutor_cabinet.html', 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        # Если файл не найден, создаем простую страницу
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Кабинет репетитора</title>
-            <link rel="stylesheet" href="/styles.css">
-        </head>
-        <body>
-            <div class="container">
-                <nav class="navbar">
-                    <div class="nav-brand"><span>🎓 Кабинет репетитора</span></div>
-                    <ul class="nav-menu">
-                        <li><a href="/">Главная</a></li>
-                        <li><a href="/cabinet">Выйти</a></li>
-                    </ul>
-                </nav>
-                <header class="header">
-                    <div class="header-info">
-                        <h1>Добро пожаловать, репетитор!</h1>
-                        <h2>Вы успешно вошли в систему</h2>
-                        <p>ID: {session.get('user_id')}, Имя: {session.get('first_name')} {session.get('last_name')}</p>
-                    </div>
-                </header>
-                <section class="login-section">
-                    <h2>🎉 Поздравляем! Система аутентификации работает!</h2>
-                    <div class="login-container">
-                        <p><strong>Репетитор:</strong> {session.get('first_name')} {session.get('last_name')}</p>
-                        <p><strong>Логин:</strong> {session.get('username')}</p>
-                        <p><strong>ID:</strong> {session.get('user_id')}</p>
-                        <p>Основной кабинет будет доступен после настройки шаблонов.</p>
-                        <button onclick="logout()" class="login-btn">Выйти</button>
-                    </div>
-                </section>
-            </div>
-            <script>
-                function logout() {{
-                    fetch('/api/logout', {{method: 'POST'}}).then(() => window.location.href = '/cabinet');
-                }}
-            </script>
-        </body>
-        </html>
-        """
+        return render_template('tutor_cabinet.html')
+    except Exception as e:
+        print(f"❌ Ошибка при рендеринге шаблона: {e}")
+        return f"Ошибка загрузки страницы: {e}", 500
 
 @app.route('/student-cabinet')
 def student_cabinet():
@@ -361,7 +321,38 @@ def index():
 def cabinet():
     """Страница личного кабинета"""
     return render_template('cabinet.html')
+@app.route('/materials')
+def materials():
+    """Страница учебных материалов"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+    return render_template('materials.html')
 
+@app.route('/requests')
+def requests():
+    """Страница запросов на перенос"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+    return render_template('requests.html')
+
+@app.route('/reschedule')
+def reschedule():
+    """Страница запросов на перенос"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+
+    try:
+        with open('templates/reschedule.html', 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Страница запросов на перенос не найдена", 404
+
+@app.route('/income')
+def income():
+    """Страница доходов"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+    return render_template('income.html')
 @app.route('/App.js')
 def serve_app_js():
     """Обслуживание App.js"""

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доходы - Кабинет репетитора</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .income-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .income-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: #FEFCF8;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid #88746b;
+        }
+
+        .period-btn {
+            padding: 10px 20px;
+            border: 2px solid transparent;
+            background: transparent;
+            color: #88746b;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            color: #FEFCF8;
+            border-color: #88746b;
+        }
+
+        .period-btn:hover:not(.active) {
+            background: rgba(136, 116, 107, 0.1);
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-report {
+            background: linear-gradient(135deg, #339af0, #228be6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-report:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(51, 154, 240, 0.4);
+        }
+
+        /* Основная статистика */
+        .main-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .stat-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #88746b;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+
+        .stat-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #88746b;
+            margin: 0 0 10px 0;
+        }
+
+        .stat-change {
+            font-size: 0.9em;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .change-positive {
+            background: rgba(81, 207, 102, 0.2);
+            color: #2b8a3e;
+        }
+
+        .change-negative {
+            background: rgba(255, 107, 107, 0.2);
+            color: #c92a2a;
+        }
+
+        .change-neutral {
+            background: rgba(134, 142, 150, 0.2);
+            color: #495057;
+        }
+
+        /* Статистика оплат */
+        .payment-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .payment-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .payment-title {
+            color: #88746b;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .payment-total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #88746b;
+        }
+
+        .payment-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .payment-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .badge-paid {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .badge-pending {
+            background: linear-gradient(135deg, #ffd43b, #fab005);
+        }
+
+        .badge-overdue {
+            background: linear-gradient(135deg, #ff6b6b, #fa5252);
+        }
+
+        .payment-amount {
+            font-weight: 600;
+            color: #88746b;
+        }
+
+        .payment-count {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* График и детализация */
+        .charts-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .chart-title {
+            color: #88746b;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 0 0 25px 0;
+            text-align: center;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            margin-top: 30px;
+        }
+
+        .chart-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar {
+            width: 40px;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .bar:hover {
+            transform: scale(1.05);
+        }
+
+        .bar-paid {
+            background: linear-gradient(to top, #51cf66, #40c057);
+        }
+
+        .bar-pending {
+            background: linear-gradient(to top, #ffd43b, #fab005);
+        }
+
+        .bar-overdue {
+            background: linear-gradient(to top, #ff6b6b, #fa5252);
+        }
+
+        .bar-label {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #88746b;
+        }
+
+        /* Детализация доходов */
+        .income-details {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .income-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .details-header {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            color: #FEFCF8;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .details-summary {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .income-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .income-table th {
+            background: rgba(136, 116, 107, 0.1);
+            color: #88746b;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #88746b;
+        }
+
+        .income-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #666;
+        }
+
+        .income-table tr:hover {
+            background: rgba(136, 116, 107, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-paid {
+            background: #51cf66;
+        }
+
+        .status-pending {
+            background: #ffd43b;
+            color: #333;
+        }
+
+        .status-overdue {
+            background: #ff6b6b;
+        }
+
+        .student-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #FEFCF8;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .income-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .period-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .export-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-export, .btn-report {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .income-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>🎓 Кабинет репетитора</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="/tutor-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/timetable" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/students" style="display: block; text-decoration: none; color: inherit;">
+                            👥 Ученики
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/reschedule" style="display: block; text-decoration: none; color: inherit;">
+                            🔄 Запросы на перенос
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="/income" style="display: block; text-decoration: none; color: inherit;">
+                            💰 Доходы
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <div id="income" class="page-section active">
+                    <header class="header">
+                        <h1>💰 Финансовые отчеты</h1>
+                        <p class="subtitle">Отслеживание доходов и финансовой статистики за 2025 год</p>
+                    </header>
+
+                    <!-- Шапка с периодом и действиями -->
+                    <section class="income-header">
+                        <div class="period-selector">
+                            <button class="period-btn active" onclick="changePeriod('month')">Месяц</button>
+                            <button class="period-btn" onclick="changePeriod('quarter')">Квартал</button>
+                            <button class="period-btn" onclick="changePeriod('year')">Год</button>
+                            <select class="period-btn" style="border: 2px solid #88746b; background: white;">
+                                <option>Май 2025</option>
+                                <option>Апрель 2025</option>
+                                <option>Март 2025</option>
+                                <option>Февраль 2025</option>
+                                <option>Январь 2025</option>
+                            </select>
+                        </div>
+                        <div class="export-actions">
+                            <button class="btn-export" onclick="exportData()">
+                                📊 Экспорт в Excel
+                            </button>
+                            <button class="btn-report" onclick="generateReport()">
+                                📈 Сформировать отчет
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Основная статистика -->
+                    <section class="main-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <h3 class="stat-title">Доход за текущий месяц</h3>
+                            <p class="stat-amount">45,000 ₽</p>
+                            <span class="stat-change change-positive">+12% к прошлому месяцу</span>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <h3 class="stat-title">Прогноз на месяц</h3>
+                            <p class="stat-amount">60,000 ₽</p>
+                            <span class="stat-change change-positive">+25% к текущему</span>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <h3 class="stat-title">Средний доход за занятие</h3>
+                            <p class="stat-amount">1,500 ₽</p>
+                            <span class="stat-change change-neutral">Без изменений</span>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <h3 class="stat-title">Всего заработано в 2025</h3>
+                            <p class="stat-amount">320,000 ₽</p>
+                            <span class="stat-change change-positive">+18% к прошлому году</span>
+                        </div>
+                    </section>
+
+                    <!-- Статистика оплат -->
+                    <section class="payment-stats">
+                        <div class="payment-card">
+                            <div class="payment-header">
+                                <h3 class="payment-title">Статусы оплат за май</h3>
+                                <div class="payment-total">45,000 ₽</div>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-item">
+                                    <div class="payment-label">
+                                        <span class="payment-badge badge-paid"></span>
+                                        Оплачено
+                                    </div>
+                                    <div>
+                                        <span class="payment-amount">36,000 ₽</span>
+                                        <span class="payment-count">(24 занятия)</span>
+                                    </div>
+                                </div>
+                                <div class="payment-item">
+                                    <div class="payment-label">
+                                        <span class="payment-badge badge-pending"></span>
+                                        Ожидает оплаты
+                                    </div>
+                                    <div>
+                                        <span class="payment-amount">7,500 ₽</span>
+                                        <span class="payment-count">(5 занятий)</span>
+                                    </div>
+                                </div>
+                                <div class="payment-item">
+                                    <div class="payment-label">
+                                        <span class="payment-badge badge-overdue"></span>
+                                        Просрочено
+                                    </div>
+                                    <div>
+                                        <span class="payment-amount">1,500 ₽</span>
+                                        <span class="payment-count">(1 занятие)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-card">
+                            <div class="payment-header">
+                                <h3 class="payment-title">Распределение по экзаменам</h3>
+                                <div class="payment-total">45,000 ₽</div>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-item">
+                                    <div class="payment-label">
+                                        <span style="color: #339af0;">🎓</span>
+                                        Подготовка к ЕГЭ
+                                    </div>
+                                    <div>
+                                        <span class="payment-amount">25,000 ₽</span>
+                                        <span class="payment-count">(55%)</span>
+                                    </div>
+                                </div>
+                                <div class="payment-item">
+                                    <div class="payment-label">
+                                        <span style="color: #51cf66;">🎯</span>
+                                        Подготовка к ОГЭ
+                                    </div>
+                                    <div>
+                                        <span class="payment-amount">20,000 ₽</span>
+                                        <span class="payment-count">(45%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- График и детализация -->
+                    <section class="charts-details">
+                        <!-- График оплат -->
+                        <div class="chart-container">
+                            <h3 class="chart-title">Статистика оплат за май 2025</h3>
+                            <div class="chart-bars">
+                                <div class="chart-bar">
+                                    <div class="bar bar-paid" style="height: 160px;">
+                                        <span class="bar-value">36,000₽</span>
+                                    </div>
+                                    <span class="bar-label">Оплачено</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="bar bar-pending" style="height: 80px;">
+                                        <span class="bar-value">7,500₽</span>
+                                    </div>
+                                    <span class="bar-label">Ожидает</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="bar bar-overdue" style="height: 30px;">
+                                        <span class="bar-value">1,500₽</span>
+                                    </div>
+                                    <span class="bar-label">Просрочено</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Детализация доходов -->
+                        <div class="income-details">
+                            <div class="details-header">
+                                <h3 class="details-title">Детализация доходов за май</h3>
+                                <div class="details-summary">30 занятий • 45,000 ₽</div>
+                            </div>
+                            <table class="income-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Ученик</th>
+                                        <th>Экзамен</th>
+                                        <th>Стоимость</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>20.05.2025</td>
+                                        <td><span class="student-avatar-small">АП</span>Алексей Петров</td>
+                                        <td>ОГЭ</td>
+                                        <td>1,500 ₽</td>
+                                        <td><span class="status-badge status-paid">Оплачено</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>19.05.2025</td>
+                                        <td><span class="student-avatar-small">ЕС</span>Елена Сидорова</td>
+                                        <td>ЕГЭ</td>
+                                        <td>2,000 ₽</td>
+                                        <td><span class="status-badge status-paid">Оплачено</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>18.05.2025</td>
+                                        <td><span class="student-avatar-small">ИК</span>Иван Козлов</td>
+                                        <td>ОГЭ</td>
+                                        <td>1,500 ₽</td>
+                                        <td><span class="status-badge status-pending">Ожидает</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>17.05.2025</td>
+                                        <td><span class="student-avatar-small">ОН</span>Ольга Новикова</td>
+                                        <td>ЕГЭ</td>
+                                        <td>2,000 ₽</td>
+                                        <td><span class="status-badge status-overdue">Просрочено</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>16.05.2025</td>
+                                        <td><span class="student-avatar-small">ДВ</span>Дмитрий Волков</td>
+                                        <td>ОГЭ</td>
+                                        <td>1,500 ₽</td>
+                                        <td><span class="status-badge status-paid">Оплачено</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для выделения активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Функции для работы с доходами
+        function changePeriod(period) {
+            const buttons = document.querySelectorAll('.period-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            console.log('Смена периода на:', period);
+            // Здесь будет логика загрузки данных за период
+        }
+
+        function exportData() {
+            alert('Экспорт данных в Excel');
+            // Здесь будет логика экспорта
+        }
+
+        function generateReport() {
+            alert('Формирование отчета');
+            // Здесь будет логика формирования отчета
+        }
+
+        // Анимация графиков при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                const height = bar.style.height;
+                bar.style.height = '0px';
+                setTimeout(() => {
+                    bar.style.height = height;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
+[file content end]

@@ -5,6 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кабинет репетитора</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Дополнительные стили для улучшения внешнего вида */
+        .sidebar-menu li {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu li.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .course-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .photo-section {
+            margin-right: 20px;
+        }
+
+        .photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            color: #FEFCF8; /* Изменено на белый цвет */
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h2 {
+            margin: 5px 0;
+            color: #FEFCF8; /* Изменено на белый цвет */
+            font-weight: normal;
+            font-size: 1.4em;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #FEFCF8; /* Изменено на белый цвет */
+            margin-top: 10px;
+            font-size: 1.1em;
+            opacity: 0.8;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -25,23 +95,35 @@
                     <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
                 </div>
                 <ul class="sidebar-menu">
-                    <li class="menu-item active" onclick="showPage('dashboard')">
-                        📊 Обзор
+                    <li class="menu-item active">
+                        <a href="/tutor-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('schedule')">
-                        📅 Расписание
+                    <li class="menu-item">
+                        <a href="/timetable" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('materials')">
-                        📚 Материалы
+                    <li class="menu-item">
+                        <a href="/materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('students')">
-                        👥 Ученики
+                    <li class="menu-item">
+                        <a href="/students" style="display: block; text-decoration: none; color: inherit;">
+                            👥 Ученики
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('requests')">
-                        🔄 Запросы на перенос
+                    <li class="menu-item">
+                        <a href="/reschedule" style="display: block; text-decoration: none; color: inherit;">
+                            🔄 Запросы на перенос
+                        </a>
                     </li>
-                    <li class="menu-item" onclick="showPage('income')">
-                        💰 Доходы
+                    <li class="menu-item">
+                        <a href="/income" style="display: block; text-decoration: none; color: inherit;">
+                            💰 Доходы
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -82,6 +164,44 @@
                         </div>
                     </section>
 
+                    <section class="quick-actions">
+                        <h2>Быстрые действия</h2>
+                        <div class="course-grid">
+                            <div class="course-card" style="text-align: center; cursor: pointer;" onclick="location.href='/timetable'">
+                                <h3>📅 Добавить занятие</h3>
+                                <p>Создать новое занятие в расписании</p>
+                            </div>
+                            <div class="course-card" style="text-align: center; cursor: pointer;" onclick="location.href='/students'">
+                                <h3>👥 Добавить ученика</h3>
+                                <p>Зарегистрировать нового ученика</p>
+                            </div>
+                            <div class="course-card" style="text-align: center; cursor: pointer;" onclick="location.href='/materials'">
+                                <h3>📚 Загрузить материал</h3>
+                                <p>Добавить новый учебный материал</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // Функция для выделения активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+[file content end]
