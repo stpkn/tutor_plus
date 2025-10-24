@@ -307,6 +307,18 @@ def student_cabinet():
 def tests():
     return render_template('tests.html')
 
+@app.route('/tests/1')
+def test_1():
+    return render_template('test_1.html')
+
+@app.route('/tests/2')
+def test_2():
+    return render_template('test_2.html')
+
+@app.route('/tests/3')
+def test_3():
+    return render_template('test_3.html')
+
 @app.route('/timetable')
 #расписание
 def timetable():
@@ -389,6 +401,7 @@ def students():
     if 'user_id' not in session or session['role'] != 'tutor':
         return "Доступ запрещен. Только для репетиторов.", 403
     return render_template('students.html')
+
 
 if __name__ == '__main__':
     print("🚀 Flask сервер запущен!")
