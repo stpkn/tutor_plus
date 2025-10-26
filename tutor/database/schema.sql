@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) NOT NULL CHECK (role IN ('tutor', 'student')),
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
+    exam_type VARCHAR(10) CHECK (exam_type IN ('oge', 'ege')), -- ДОБАВЬТЕ ЭТУ СТРОКУ
     lesson_price DECIMAL(10,2) DEFAULT 0.00,
     contact_info TEXT,
     is_active BOOLEAN DEFAULT 1,
