@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить ученика - Кабинет репетитора</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .add-student-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            color: #88746b;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .student-form {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #88746b;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #88746b;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #FEFCF8;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6B5B73;
+            box-shadow: 0 0 10px rgba(136, 116, 107, 0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .exam-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .exam-option {
+            position: relative;
+        }
+
+        .exam-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .exam-label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #88746b;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #FEFCF8;
+            font-weight: 600;
+            color: #88746b;
+        }
+
+        .exam-option input:checked + .exam-label {
+            background: linear-gradient(135deg, #88746b, #6B5B73);
+            color: #FEFCF8;
+            border-color: #88746b;
+        }
+
+        .exam-label:hover {
+            background: rgba(136, 116, 107, 0.1);
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #88746b;
+            font-size: 1.2em;
+        }
+
+        .schedule-section {
+            background: rgba(136, 116, 107, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #88746b;
+            margin-top: 20px;
+        }
+
+        .schedule-section h4 {
+            color: #88746b;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .time-display {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #88746b;
+            font-weight: 600;
+            color: #88746b;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #868e96, #495057);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(134, 142, 150, 0.4);
+        }
+
+        .generated-credentials {
+            background: rgba(136, 116, 107, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #88746b;
+            margin-top: 20px;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .credential-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .credential-label {
+            font-weight: 600;
+            color: #88746b;
+        }
+
+        .credential-value {
+            font-family: monospace;
+            background: rgba(136, 116, 107, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            background: #88746b;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #6B5B73;
+        }
+
+        @media (max-width: 768px) {
+            .add-student-container {
+                padding: 20px;
+            }
+
+            .student-form {
+                padding: 25px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .exam-options {
+                grid-template-columns: 1fr;
+            }
+
+            .time-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-submit,
+            .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>🎓 Кабинет репетитора</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/students">Ученики</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 style="color: #FEFCF8; margin: 0;">Панель управления</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="/tutor-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/timetable" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/students" style="display: block; text-decoration: none; color: inherit;">
+                            👥 Ученики
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/reschedule" style="display: block; text-decoration: none; color: inherit;">
+                            🔄 Запросы на перенос
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/income" style="display: block; text-decoration: none; color: inherit;">
+                            💰 Доходы
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <div class="add-student-container">
+                    <div class="form-header">
+                        <h1>👤 Добавить нового ученика</h1>
+                        <p>Заполните информацию о новом ученике для создания учетной записи</p>
+                    </div>
+
+                    <form class="student-form" id="addStudentForm">
+                        <!-- Личная информация -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lastName">Фамилия *</label>
+                                <input type="text" id="lastName" name="lastName" required placeholder="Введите фамилию">
+                            </div>
+                            <div class="form-group">
+                                <label for="firstName">Имя *</label>
+                                <input type="text" id="firstName" name="firstName" required placeholder="Введите имя">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="birthDate">Дата рождения *</label>
+                            <input type="date" id="birthDate" name="birthDate" required>
+                        </div>
+
+                        <!-- Экзамен -->
+                        <div class="form-group">
+                            <label>Подготовка к экзамену *</label>
+                            <div class="exam-options">
+                                <div class="exam-option">
+                                    <input type="radio" id="oge" name="exam" value="oge" required>
+                                    <label for="oge" class="exam-label">🎯 ОГЭ</label>
+                                </div>
+                                <div class="exam-option">
+                                    <input type="radio" id="ege" name="exam" value="ege" required>
+                                    <label for="ege" class="exam-label">🎓 ЕГЭ</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Расписание занятий -->
+                        <div class="schedule-section">
+                            <h4>📅 Расписание занятий</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="dayOfWeek">День недели *</label>
+                                    <select id="dayOfWeek" name="dayOfWeek" required>
+                                        <option value="">Выберите день</option>
+                                        <option value="monday">Понедельник</option>
+                                        <option value="tuesday">Вторник</option>
+                                        <option value="wednesday">Среда</option>
+                                        <option value="thursday">Четверг</option>
+                                        <option value="friday">Пятница</option>
+                                        <option value="saturday">Суббота</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lessonTime">Время занятия *</label>
+                                    <select id="lessonTime" name="lessonTime" required>
+                                        <option value="">Выберите время</option>
+                                        <!-- Время с 9:00 до 21:00 с шагом в 1 час -->
+                                        <option value="09:00">09:00 - 10:00</option>
+                                        <option value="10:00">10:00 - 11:00</option>
+                                        <option value="11:00">11:00 - 12:00</option>
+                                        <option value="12:00">12:00 - 13:00</option>
+                                        <option value="13:00">13:00 - 14:00</option>
+                                        <option value="14:00">14:00 - 15:00</option>
+                                        <option value="15:00">15:00 - 16:00</option>
+                                        <option value="16:00">16:00 - 17:00</option>
+                                        <option value="17:00">17:00 - 18:00</option>
+                                        <option value="18:00">18:00 - 19:00</option>
+                                        <option value="19:00">19:00 - 20:00</option>
+                                        <option value="20:00">20:00 - 21:00</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="time-display" id="scheduleDisplay">
+                                Расписание не выбрано
+                            </div>
+                        </div>
+
+                        <!-- Учетные данные -->
+                        <div class="form-group">
+                            <label for="username">Логин для входа *</label>
+                            <input type="text" id="username" name="username" required placeholder="Придумайте логин">
+                            <small style="color: #666; font-size: 0.9em;">Ученик будет использовать этот логин для входа в систему</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Пароль для входа *</label>
+                            <div class="password-field">
+                                <input type="password" id="password" name="password" required placeholder="Придумайте пароль">
+                                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                            </div>
+                            <small style="color: #666; font-size: 0.9em;">Минимум 6 символов</small>
+                        </div>
+
+                        <!-- Стоимость занятия -->
+                        <div class="form-group">
+                            <label for="lessonPrice">Стоимость занятия (руб) *</label>
+                            <input type="number" id="lessonPrice" name="lessonPrice" required placeholder="1500" min="0" step="100">
+                        </div>
+
+                        <!-- Сгенерированные учетные данные -->
+                        <div class="generated-credentials" id="credentialsPreview" style="display: none;">
+                            <h4 style="color: #88746b; margin-bottom: 15px;">📋 Учетные данные для ученика:</h4>
+                            <div class="credential-item">
+                                <span class="credential-label">Логин:</span>
+                                <span class="credential-value" id="previewUsername"></span>
+                                <button type="button" class="copy-btn" onclick="copyToClipboard('previewUsername')">📋</button>
+                            </div>
+                            <div class="credential-item">
+                                <span class="credential-label">Пароль:</span>
+                                <span class="credential-value" id="previewPassword"></span>
+                                <button type="button" class="copy-btn" onclick="copyToClipboard('previewPassword')">📋</button>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="goBack()">
+                                ❌ Отмена
+                            </button>
+                            <button type="submit" class="btn-submit">
+                                ✅ Создать ученика
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для выделения активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(function(item) {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === '/students') {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Обновление предпросмотра учетных данных
+            document.getElementById('username').addEventListener('input', updateCredentialsPreview);
+            document.getElementById('password').addEventListener('input', updateCredentialsPreview);
+
+            // Обновление отображения расписания
+            document.getElementById('dayOfWeek').addEventListener('change', updateScheduleDisplay);
+            document.getElementById('lessonTime').addEventListener('change', updateScheduleDisplay);
+        });
+
+        // Обновление отображения расписания
+        function updateScheduleDisplay() {
+            const daySelect = document.getElementById('dayOfWeek');
+            const timeSelect = document.getElementById('lessonTime');
+            const display = document.getElementById('scheduleDisplay');
+
+            const dayNames = {
+                'monday': 'Понедельник',
+                'tuesday': 'Вторник',
+                'wednesday': 'Среда',
+                'thursday': 'Четверг',
+                'friday': 'Пятница',
+                'saturday': 'Суббота'
+            };
+
+            if (daySelect.value && timeSelect.value) {
+                const dayName = dayNames[daySelect.value];
+                const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+                display.textContent = `${dayName}, ${timeText}`;
+                display.style.color = '#88746b';
+                display.style.background = 'linear-gradient(135deg, #FEFCF8, #F5F0E8)';
+            } else {
+                display.textContent = 'Расписание не выбрано';
+                display.style.color = '#666';
+                display.style.background = 'white';
+            }
+        }
+
+        // Переключение видимости пароля
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const toggleButton = document.querySelector('.toggle-password');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleButton.textContent = '🔒';
+            } else {
+                passwordField.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+
+        // Обновление предпросмотра учетных данных
+        function updateCredentialsPreview() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const preview = document.getElementById('credentialsPreview');
+
+            if (username || password) {
+                preview.style.display = 'block';
+                document.getElementById('previewUsername').textContent = username || 'не указан';
+                document.getElementById('previewPassword').textContent = password ? '•'.repeat(password.length) : 'не указан';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Копирование в буфер обмена
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = element.textContent;
+                element.textContent = 'Скопировано!';
+                setTimeout(function() {
+                    element.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Назад к списку учеников
+        function goBack() {
+            window.location.href = '/students';
+        }
+
+        // Обработка отправки формы
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Сбор данных формы
+            const formData = {
+                last_name: document.getElementById('lastName').value,
+                first_name: document.getElementById('firstName').value,
+                birth_date: document.getElementById('birthDate').value,
+                exam_type: document.querySelector('input[name="exam"]:checked').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                lesson_price: parseInt(document.getElementById('lessonPrice').value),
+                day_of_week: document.getElementById('dayOfWeek').value,
+                lesson_time: document.getElementById('lessonTime').value
+            };
+
+            // Валидация
+            if (formData.password.length < 6) {
+                alert('Пароль должен содержать минимум 6 символов');
+                return;
+            }
+
+            if (formData.lesson_price <= 0) {
+                alert('Стоимость занятия должна быть положительным числом');
+                return;
+            }
+
+            if (!formData.day_of_week) {
+                alert('Пожалуйста, выберите день недели для занятий');
+                return;
+            }
+
+            if (!formData.lesson_time) {
+                alert('Пожалуйста, выберите время занятия');
+                return;
+            }
+
+            const submitBtn = document.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.innerHTML = '⏳ Создание...';
+                submitBtn.disabled = true;
+
+                const response = await fetch('/api/tutor/create-student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Ученик успешно создан!');
+                    window.location.href = '/students';
+                } else {
+                    alert('❌ Ошибка: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('⚠️ Ошибка при создании ученика');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Генерация случайного пароля
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('password').value = password;
+            updateCredentialsPreview();
+        }
+
+        // Автогенерация логина на основе имени и фамилии
+        document.getElementById('lastName').addEventListener('blur', generateUsername);
+        document.getElementById('firstName').addEventListener('blur', generateUsername);
+
+        function generateUsername() {
+            const lastName = document.getElementById('lastName').value;
+            const firstName = document.getElementById('firstName').value;
+
+            if (lastName && firstName && !document.getElementById('username').value) {
+                const username = (firstName.charAt(0) + lastName).toLowerCase();
+                document.getElementById('username').value = username;
+                updateCredentialsPreview();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -48,30 +48,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
         }
 
         .btn-create:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
-        }
-
-        .btn-import {
-            background: linear-gradient(135deg, #339af0, #228be6);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-import:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(51, 154, 240, 0.4);
         }
 
         .filters-search {
@@ -120,7 +102,6 @@
             color: #88746b;
         }
 
-        /* Секции учеников */
         .exam-sections {
             display: flex;
             flex-direction: column;
@@ -249,12 +230,6 @@
             font-weight: 600;
         }
 
-        .student-class {
-            color: #666;
-            margin: 5px 0;
-            font-size: 1.1em;
-        }
-
         .student-exam {
             display: inline-block;
             padding: 6px 12px;
@@ -299,50 +274,6 @@
             margin: 5px 0 0 0;
         }
 
-        .student-progress {
-            margin-bottom: 20px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .progress-label {
-            color: #88746b;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-
-        .progress-percent {
-            color: #666;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-fill.oge {
-            background: linear-gradient(90deg, #51cf66, #40c057);
-        }
-
-        .progress-fill.ege {
-            background: linear-gradient(90deg, #339af0, #228be6);
-        }
-
         .student-actions {
             display: flex;
             gap: 8px;
@@ -374,16 +305,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-message {
-            background: linear-gradient(135deg, #ffd43b, #fab005);
-            color: white;
-        }
-
-        .btn-message:hover {
-            background: linear-gradient(135deg, #fab005, #ffd43b);
-            transform: translateY(-2px);
-        }
-
         .btn-edit {
             background: linear-gradient(135deg, #868e96, #495057);
             color: white;
@@ -394,7 +315,16 @@
             transform: translateY(-2px);
         }
 
-        /* Общая статистика */
+        .btn-delete {
+            background: linear-gradient(135deg, #ff6b6b, #fa5252);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #fa5252, #ff6b6b);
+            transform: translateY(-2px);
+        }
+
         .overview-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -406,7 +336,6 @@
             background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
             padding: 25px;
             border-radius: 15px;
-            text-align: center;
             border: 2px solid #88746b;
             position: relative;
             overflow: hidden;
@@ -438,6 +367,41 @@
             color: #666;
             margin: 10px 0 0 0;
             font-size: 0.9em;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #ff6b6b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         @media (max-width: 768px) {
@@ -535,299 +499,47 @@
                     <section class="overview-stats">
                         <div class="overview-card">
                             <div class="overview-icon">👥</div>
-                            <p class="overview-number">12</p>
+                            <p class="overview-number">0</p>
                             <p class="overview-label">Всего учеников</p>
                         </div>
                         <div class="overview-card">
                             <div class="overview-icon">🎯</div>
-                            <p class="overview-number">7</p>
+                            <p class="overview-number">0</p>
                             <p class="overview-label">Подготовка к ОГЭ</p>
                         </div>
                         <div class="overview-card">
                             <div class="overview-icon">🎓</div>
-                            <p class="overview-number">5</p>
+                            <p class="overview-number">0</p>
                             <p class="overview-label">Подготовка к ЕГЭ</p>
-                        </div>
-                        <div class="overview-card">
-                            <div class="overview-icon">📈</div>
-                            <p class="overview-number">78%</p>
-                            <p class="overview-label">Средний прогресс</p>
                         </div>
                     </section>
 
                     <!-- Шапка с действиями -->
                     <section class="students-header">
                         <div class="students-actions">
-                            <button class="btn-create" onclick="createStudent()">
+                            <a href="/add-student" class="btn-create">
                                 <span>👤</span>
                                 Создать ученика
-                            </button>
-                            <button class="btn-import" onclick="importStudents()">
-                                <span>📥</span>
-                                Импорт списка
-                            </button>
+                            </a>
                         </div>
                         <div class="filters-search">
-                            <select class="filter-select" onchange="filterStudents()">
-                                <option>Все ученики</option>
-                                <option>Только ОГЭ</option>
-                                <option>Только ЕГЭ</option>
-                                <option>Активные</option>
-                                <option>Новые</option>
+                            <select class="filter-select" id="examFilter">
+                                <option value="all">Все ученики</option>
+                                <option value="oge">Только ОГЭ</option>
+                                <option value="ege">Только ЕГЭ</option>
                             </select>
                             <div class="search-box">
-                                <input type="text" placeholder="Поиск учеников..." onkeyup="searchStudents()">
+                                <input type="text" placeholder="Поиск учеников..." id="searchInput">
                                 <button class="search-btn">🔍</button>
                             </div>
                         </div>
                     </section>
 
                     <!-- Секции учеников -->
-                    <section class="exam-sections">
-                        <!-- Секция ОГЭ -->
-                        <div class="exam-section">
-                            <div class="section-header">
-                                <div class="section-title">
-                                    <span>🎯</span>
-                                    Подготовка к ОГЭ
-                                </div>
-                                <div class="section-stats">
-                                    <span>7 учеников</span>
-                                    <span>Средний прогресс: 75%</span>
-                                </div>
-                            </div>
-                            <div class="students-grid">
-                                <!-- Ученик ОГЭ 1 -->
-                                <div class="student-card oge">
-                                    <div class="student-header">
-                                        <div class="student-avatar oge">АП</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">Алексей Петров</h3>
-                                            <p class="student-class">9 класс • 15 лет</p>
-                                            <span class="student-exam oge">ОГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">12</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">85%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Алгоритмизация</span>
-                                            <span class="progress-percent">85%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill oge" style="width: 85%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(1)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(1)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(1)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-
-                                <!-- Ученик ОГЭ 2 -->
-                                <div class="student-card oge">
-                                    <div class="student-header">
-                                        <div class="student-avatar oge">ИК</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">Иван Козлов</h3>
-                                            <p class="student-class">9 класс • 15 лет</p>
-                                            <span class="student-exam oge">ОГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">15</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">91%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Базы данных</span>
-                                            <span class="progress-percent">91%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill oge" style="width: 91%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(2)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(2)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(2)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-
-                                <!-- Ученик ОГЭ 3 -->
-                                <div class="student-card oge">
-                                    <div class="student-header">
-                                        <div class="student-avatar oge">ДВ</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">Дмитрий Волков</h3>
-                                            <p class="student-class">9 класс • 14 лет</p>
-                                            <span class="student-exam oge">ОГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">10</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">78%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Логика</span>
-                                            <span class="progress-percent">78%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill oge" style="width: 78%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(3)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(3)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(3)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Секция ЕГЭ -->
-                        <div class="exam-section">
-                            <div class="section-header">
-                                <div class="section-title">
-                                    <span>🎓</span>
-                                    Подготовка к ЕГЭ
-                                </div>
-                                <div class="section-stats">
-                                    <span>5 учеников</span>
-                                    <span>Средний прогресс: 82%</span>
-                                </div>
-                            </div>
-                            <div class="students-grid">
-                                <!-- Ученик ЕГЭ 1 -->
-                                <div class="student-card ege">
-                                    <div class="student-header">
-                                        <div class="student-avatar ege">ЕС</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">Елена Сидорова</h3>
-                                            <p class="student-class">11 класс • 17 лет</p>
-                                            <span class="student-exam ege">ЕГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">8</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">72%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Системы счисления</span>
-                                            <span class="progress-percent">72%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill ege" style="width: 72%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(4)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(4)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(4)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-
-                                <!-- Ученик ЕГЭ 2 -->
-                                <div class="student-card ege">
-                                    <div class="student-header">
-                                        <div class="student-avatar ege">ОН</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">Ольга Новикова</h3>
-                                            <p class="student-class">11 класс • 17 лет</p>
-                                            <span class="student-exam ege">ЕГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">5</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">65%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Динамическое программирование</span>
-                                            <span class="progress-percent">65%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill ege" style="width: 65%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(5)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(5)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(5)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-
-                                <!-- Ученик ЕГЭ 3 -->
-                                <div class="student-card ege">
-                                    <div class="student-header">
-                                        <div class="student-avatar ege">СИ</div>
-                                        <div class="student-info">
-                                            <h3 class="student-name">София Иванова</h3>
-                                            <p class="student-class">11 класс • 16 лет</p>
-                                            <span class="student-exam ege">ЕГЭ</span>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <p class="stat-value">7</p>
-                                            <p class="stat-label">Занятий</p>
-                                        </div>
-                                        <div class="stat-item">
-                                            <p class="stat-value">80%</p>
-                                            <p class="stat-label">Прогресс</p>
-                                        </div>
-                                    </div>
-                                    <div class="student-progress">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Алгоритмы</span>
-                                            <span class="progress-percent">80%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill ege" style="width: 80%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-action btn-profile" onclick="viewProfile(6)">👁️ Профиль</button>
-                                        <button class="btn-action btn-message" onclick="sendMessage(6)">💬 Написать</button>
-                                        <button class="btn-action btn-edit" onclick="editStudent(6)">✏️ Редакт.</button>
-                                    </div>
-                                </div>
-                            </div>
+                    <section class="exam-sections" id="studentsContainer">
+                        <div class="loading-state">
+                            <div class="loading-icon">⏳</div>
+                            <p>Загрузка списка учеников...</p>
                         </div>
                     </section>
                 </div>
@@ -836,59 +548,266 @@
     </div>
 
     <script>
-        // Функция для выделения активного пункта меню
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const menuItems = document.querySelectorAll('.menu-item');
+        let allStudents = [];
 
-            menuItems.forEach(item => {
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(function(item) {
                 const link = item.querySelector('a');
-                if (link && link.getAttribute('href') === currentPath) {
+                if (link && link.getAttribute('href') === '/students') {
                     item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
                 }
             });
+
+            // Добавляем обработчики событий
+            document.getElementById('examFilter').addEventListener('change', filterStudents);
+            document.getElementById('searchInput').addEventListener('input', searchStudents);
+
+            loadStudents();
         });
 
-        // Функции для работы с учениками
-        function createStudent() {
-            alert('Открытие формы создания нового ученика');
-            // Здесь будет логика открытия модального окна
-        }
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/tutor/students');
+                const result = await response.json();
 
-        function importStudents() {
-            alert('Импорт списка учеников');
-            // Здесь будет логика импорта
+                if (result.success) {
+                    allStudents = result.students;
+                    filterStudents();
+                    updateStats(allStudents);
+                } else {
+                    showError('Ошибка при загрузке учеников');
+                }
+            } catch (error) {
+                showError('Ошибка при загрузке учеников');
+            }
         }
 
         function filterStudents() {
-            const filter = event.target.value;
-            console.log('Фильтрация по:', filter);
-            // Здесь будет логика фильтрации
+            const filterValue = document.getElementById('examFilter').value;
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+
+            let filteredStudents = allStudents;
+
+            // Фильтрация по типу экзамена
+            if (filterValue !== 'all') {
+                filteredStudents = filteredStudents.filter(function(student) {
+                    return student.exam_type === filterValue;
+                });
+            }
+
+            // Поиск по имени и фамилии
+            if (searchValue) {
+                filteredStudents = filteredStudents.filter(function(student) {
+                    const fullName = (student.first_name + ' ' + student.last_name).toLowerCase();
+                    return fullName.includes(searchValue);
+                });
+            }
+
+            displayStudents(filteredStudents);
         }
 
         function searchStudents() {
-            const query = event.target.value;
-            console.log('Поиск:', query);
-            // Здесь будет логика поиска
+            filterStudents();
+        }
+
+        function displayStudents(students) {
+            const container = document.getElementById('studentsContainer');
+
+            if (!students || students.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">👥</div>
+                        <h3>Пока нет учеников</h3>
+                        <p>Добавьте первого ученика, чтобы начать работу</p>
+                        <a href="/add-student" class="btn-create" style="margin-top: 20px; display: inline-flex;">
+                            <span>👤</span>
+                            Добавить ученика
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            const ogeStudents = students.filter(function(s) { return s.exam_type === 'oge'; });
+            const egeStudents = students.filter(function(s) { return s.exam_type === 'ege'; });
+
+            let html = '';
+
+            if (ogeStudents.length > 0) {
+                html += `
+                    <div class="exam-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>🎯</span>
+                                Подготовка к ОГЭ
+                            </div>
+                            <div class="section-stats">
+                                <span>${ogeStudents.length} учеников</span>
+                            </div>
+                        </div>
+                        <div class="students-grid">
+                            ${ogeStudents.map(function(student) { return createStudentCard(student); }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (egeStudents.length > 0) {
+                html += `
+                    <div class="exam-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>🎓</span>
+                                Подготовка к ЕГЭ
+                            </div>
+                            <div class="section-stats">
+                                <span>${egeStudents.length} учеников</span>
+                            </div>
+                        </div>
+                        <div class="students-grid">
+                            ${egeStudents.map(function(student) { return createStudentCard(student); }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function createStudentCard(student) {
+            const lessonCount = student.lesson_count || 8;
+            const avatarText = getAvatarText(student.first_name, student.last_name);
+            const examClass = student.exam_type === 'oge' ? 'oge' : 'ege';
+            const examLabel = student.exam_type === 'oge' ? 'ОГЭ' : 'ЕГЭ';
+            const lessonPrice = student.lesson_price || 1500;
+
+            // Получаем информацию о расписании
+            const scheduleInfo = getScheduleInfo(student);
+
+            return `
+                <div class="student-card ${examClass}">
+                    <div class="student-header">
+                        <div class="student-avatar ${examClass}">${avatarText}</div>
+                        <div class="student-info">
+                            <h3 class="student-name">${student.first_name} ${student.last_name}</h3>
+                            <p style="color: #666; margin: 5px 0;">${lessonPrice} руб/занятие</p>
+                            <span class="student-exam ${examClass}">${examLabel}</span>
+                        </div>
+                    </div>
+                    <div class="student-stats">
+                        <div class="stat-item">
+                            <p class="stat-value">${lessonCount}</p>
+                            <p class="stat-label">Занятий проведено</p>
+                        </div>
+                        <div class="stat-item">
+                            <p class="stat-value" style="font-size: 1.2em;">${scheduleInfo.time}</p>
+                            <p class="stat-label">${scheduleInfo.day}</p>
+                        </div>
+                    </div>
+                    <div class="student-actions">
+                        <button class="btn-action btn-profile" onclick="viewProfile(${student.id})">👁️ Профиль</button>
+                        <button class="btn-action btn-edit" onclick="editStudent(${student.id})">✏️ Редакт.</button>
+                        <button class="btn-action btn-delete" onclick="deleteStudent(${student.id}, '${student.first_name} ${student.last_name}')">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getScheduleInfo(student) {
+            // Если у ученика есть информация о расписании в данных
+            if (student.day_of_week && student.lesson_time) {
+                const dayNames = {
+                    'monday': 'Понедельник',
+                    'tuesday': 'Вторник',
+                    'wednesday': 'Среда',
+                    'thursday': 'Четверг',
+                    'friday': 'Пятница',
+                    'saturday': 'Суббота'
+                };
+
+                const dayName = dayNames[student.day_of_week] || student.day_of_week;
+
+                // Форматируем время (убираем секунды если есть)
+                let timeDisplay = student.lesson_time;
+                if (student.lesson_time.includes(':')) {
+                    const timeParts = student.lesson_time.split(':');
+                    timeDisplay = `${timeParts[0]}:${timeParts[1]}`;
+                }
+
+                return {
+                    day: dayName,
+                    time: timeDisplay
+                };
+            }
+
+            // Если информации о расписании нет, показываем заглушку
+            return {
+                day: 'Расписание',
+                time: 'Не указано'
+            };
+        }
+
+        function updateStats(students) {
+            const totalStudents = students.length;
+            const ogeCount = students.filter(function(s) { return s.exam_type === 'oge'; }).length;
+            const egeCount = students.filter(function(s) { return s.exam_type === 'ege'; }).length;
+
+            const overviewNumbers = document.querySelectorAll('.overview-number');
+            if (overviewNumbers.length >= 3) {
+                overviewNumbers[0].textContent = totalStudents;
+                overviewNumbers[1].textContent = ogeCount;
+                overviewNumbers[2].textContent = egeCount;
+            }
+        }
+
+        function getAvatarText(firstName, lastName) {
+            return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+        }
+
+        function showError(message) {
+            const container = document.getElementById('studentsContainer');
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="icon">❌</div>
+                    <h3>Ошибка загрузки</h3>
+                    <p>${message}</p>
+                </div>
+            `;
         }
 
         function viewProfile(studentId) {
-            alert(`Просмотр профиля ученика #${studentId}`);
-            // Здесь будет логика перехода к профилю
-        }
-
-        function sendMessage(studentId) {
-            alert(`Отправка сообщения ученику #${studentId}`);
-            // Здесь будет логика отправки сообщения
+            alert('Просмотр профиля ученика #' + studentId);
         }
 
         function editStudent(studentId) {
-            alert(`Редактирование ученика #${studentId}`);
-            // Здесь будет логика редактирования
+            alert('Редактирование ученика #' + studentId);
         }
+
+        async function deleteStudent(studentId, studentName) {
+            if (!confirm(`Вы уверены, что хотите удалить ученика "${studentName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tutor/delete-student/${studentId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Ученик успешно удален');
+                    loadStudents(); // Перезагружаем список
+                } else {
+                    alert('Ошибка при удалении ученика: ' + result.message);
+                }
+            } catch (error) {
+                alert('Ошибка при удалении ученика');
+            }
+        }
+
+        setInterval(loadStudents, 30000);
     </script>
 </body>
 </html>
-[file content end]

@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 class Database:
     def __init__(self, db_path='database/tutoring.db'):
         self.db_path = db_path
+
     def get_connection(self):
         try:
             os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
@@ -83,30 +84,69 @@ class Database:
         finally:
             connection.close()
 
-    def create_student(self, username: str, password: str, first_name: str,
-                       last_name: str, tutor_id: int, contact_info: str = "") -> bool:
-        """Создание нового ученика"""
+    def create_student(self, username, password, first_name, last_name, tutor_id, contact_info, exam_type, lesson_price,
+                       day_of_week, lesson_time):
+        """Создание нового ученика с расписанием"""
         connection = self.get_connection()
         if not connection:
             return False
 
         try:
             cursor = connection.cursor()
-            cursor.execute("""
-                INSERT INTO users (username, password_hash, role, first_name, last_name, created_by, contact_info)
-                VALUES (?, ?, 'student', ?, ?, ?, ?)
-            """, (username, password, first_name, last_name, tutor_id, contact_info))
+
+            # Проверяем, существует ли уже пользователь с таким логином
+            cursor.execute('SELECT id FROM users WHERE username = ?', (username,))
+            if cursor.fetchone():
+                print(f"❌ Пользователь с логином '{username}' уже существует")
+                return False
+
+            # Создаем пользователя с exam_type
+            cursor.execute('''
+                INSERT INTO users (
+                    username, password_hash, role, first_name, last_name, 
+                    exam_type, lesson_price, contact_info, created_by, is_active
+                ) VALUES (?, ?, 'student', ?, ?, ?, ?, ?, ?, 1)
+            ''', (username, password, first_name, last_name, exam_type, lesson_price, contact_info, tutor_id))
+
+            student_id = cursor.lastrowid
+
+            # Создаем расписание для ученика
+            # Сначала нужно создать тему (topic) для занятий
+            cursor.execute('''
+                INSERT INTO topics (title, description, created_by)
+                VALUES (?, ?, ?)
+            ''', (f'Занятия с {first_name} {last_name}', f'Индивидуальные занятия по подготовке к {exam_type.upper()}',
+                  tutor_id))
+
+            topic_id = cursor.lastrowid
+
+            # Создаем расписание
+            start_time = lesson_time
+            # Вычисляем время окончания (занятие длится 1 час)
+            from datetime import datetime, timedelta
+            start_dt = datetime.strptime(start_time, '%H:%M')
+            end_dt = start_dt + timedelta(hours=1)
+            end_time = end_dt.strftime('%H:%M')
+
+            cursor.execute('''
+                INSERT INTO schedule (student_id, tutor_id, topic_id, day_of_week, start_time, end_time, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'active')
+            ''', (student_id, tutor_id, topic_id, day_of_week, start_time, end_time))
 
             connection.commit()
-            return cursor.lastrowid is not None
+
+            print(
+                f"✅ Ученик создан: {first_name} {last_name} (ID: {student_id}) с расписанием: {day_of_week} {start_time}-{end_time}")
+            return student_id
+
         except sqlite3.Error as e:
-            print(f"❌ Ошибка создания ученика: {e}")
+            print(f"❌ Ошибка при создании ученика: {e}")
             return False
         finally:
             connection.close()
 
     def get_tutor_students(self, tutor_id: int):
-        """Получение всех учеников репетитора"""
+        """Получение всех учеников репетитора с информацией о расписании"""
         connection = self.get_connection()
         if not connection:
             return []
@@ -114,15 +154,58 @@ class Database:
         try:
             cursor = connection.cursor()
             cursor.execute("""
-                SELECT id, username, first_name, last_name, contact_info, created_at
-                FROM users 
-                WHERE created_by = ? AND role = 'student' AND is_active = 1
-                ORDER BY created_at DESC
+                SELECT 
+                    u.id, u.username, u.first_name, u.last_name, 
+                    u.exam_type, u.lesson_price, u.contact_info, u.created_at,
+                    s.day_of_week, s.start_time as lesson_time
+                FROM users u
+                LEFT JOIN schedule s ON u.id = s.student_id AND s.status = 'active'
+                WHERE u.created_by = ? AND u.role = 'student' AND u.is_active = 1
+                ORDER BY u.created_at DESC
             """, (tutor_id,))
-            return [dict(row) for row in cursor.fetchall()]
+
+            students = []
+            for row in cursor.fetchall():
+                student = dict(row)
+                # Добавляем вычисляемые поля для отображения
+                student['progress'] = self.calculate_student_progress(student['id'])
+                student['lesson_count'] = self.get_student_lesson_count(student['id'])
+                students.append(student)
+
+            print(f"📊 Найдено учеников: {len(students)}")
+            return students
+
         except sqlite3.Error as e:
             print(f"❌ Ошибка получения учеников: {e}")
             return []
+        finally:
+            connection.close()
+
+    def update_schema(self):
+        """Обновление схемы базы данных - добавление exam_type"""
+        connection = self.get_connection()
+        if not connection:
+            return False
+
+        try:
+            cursor = connection.cursor()
+
+            # Проверяем существование колонки exam_type
+            cursor.execute("PRAGMA table_info(users)")
+            columns = [column[1] for column in cursor.fetchall()]
+
+            # Добавляем exam_type если его нет
+            if 'exam_type' not in columns:
+                print("📝 Добавляем колонку exam_type в таблицу users...")
+                cursor.execute('ALTER TABLE users ADD COLUMN exam_type VARCHAR(10) CHECK (exam_type IN ("oge", "ege"))')
+                connection.commit()
+                print("✅ Колонка exam_type добавлена")
+
+            return True
+
+        except sqlite3.Error as e:
+            print(f"❌ Ошибка обновления схемы: {e}")
+            return False
         finally:
             connection.close()
 
@@ -192,5 +275,36 @@ class Database:
         except sqlite3.Error as e:
             print(f"❌ Ошибка получения расписания репетитора: {e}")
             return []
+        finally:
+            connection.close()
+
+    def calculate_student_progress(self, student_id: int):
+        """Расчет прогресса ученика (заглушка)"""
+        # В реальном приложении здесь будет расчет прогресса на основе выполненных заданий
+        import random
+        return random.randint(50, 95)
+
+    def get_student_lesson_count(self, student_id: int):
+        """Получение количества занятий ученика"""
+        connection = self.get_connection()
+        if not connection:
+            return 0
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT COUNT(*) as count 
+                FROM lessons 
+                WHERE schedule_id IN (
+                    SELECT id FROM schedule WHERE student_id = ?
+                )
+            """, (student_id,))
+
+            result = cursor.fetchone()
+            return result['count'] if result else 0
+
+        except sqlite3.Error as e:
+            print(f"❌ Ошибка получения количества занятий: {e}")
+            return 0
         finally:
             connection.close()
