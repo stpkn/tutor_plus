@@ -9,6 +9,7 @@ auth_service = AuthService(db)
 
 # Создаем таблицы при запуске
 db.create_tables()
+db.update_schema()
 
 app = Flask(__name__)
 app.secret_key = 'tutoring-secret-key-2024'
@@ -83,41 +84,6 @@ def check_auth():
     else:
         return jsonify({'authenticated': False})
 
-
-@app.route('/api/tutor/students', methods=['GET'])
-def get_tutor_students():
-    """Получение списка учеников для репетитора"""
-    if 'user_id' not in session or session['role'] != 'tutor':
-        return jsonify({'error': 'Доступ запрещен'}), 403
-
-    students = db.get_tutor_students(session['user_id'])
-    return jsonify({'students': students})
-
-
-@app.route('/api/tutor/create-student', methods=['POST'])
-def create_student():
-    """Создание нового ученика"""
-    if 'user_id' not in session or session['role'] != 'tutor':
-        return jsonify({'error': 'Доступ запрещен'}), 403
-
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    contact_info = data.get('contact_info', '')
-
-    if not all([username, password, first_name, last_name]):
-        return jsonify({'success': False, 'message': 'Все поля обязательны'}), 400
-
-    success = db.create_student(username, password, first_name, last_name, session['user_id'], contact_info)
-
-    if success:
-        return jsonify({'success': True, 'message': 'Ученик успешно создан'})
-    else:
-        return jsonify({'success': False, 'message': 'Ошибка при создании ученика'}), 500
-
-
 @app.route('/api/schedule', methods=['GET'])
 def get_schedule():
     """Получение расписания для текущего пользователя"""
@@ -183,6 +149,51 @@ def debug_templates():
                 result[file_path]['error'] = str(e)
 
     return jsonify(result)
+
+@app.route('/debug/students')
+def debug_students():
+    """Отладочная страница для проверки учеников"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен", 403
+
+    students = db.get_tutor_students(session['user_id'])
+    return jsonify({
+        'tutor_id': session['user_id'],
+        'total_students': len(students),
+        'students': students
+    })
+
+
+@app.route('/api/tutor/delete-student/<int:student_id>', methods=['DELETE'])
+def api_delete_student(student_id):
+    """API для удаления ученика"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
+
+    try:
+        # Проверяем, что ученик принадлежит текущему репетитору
+        connection = db.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT created_by FROM users WHERE id = ?", (student_id,))
+        student = cursor.fetchone()
+
+        if not student:
+            return jsonify({'success': False, 'message': 'Ученик не найден'}), 404
+
+        if student['created_by'] != session['user_id']:
+            return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
+
+        # Удаляем ученика (или помечаем как неактивного)
+        cursor.execute("UPDATE users SET is_active = 0 WHERE id = ?", (student_id,))
+        connection.commit()
+        connection.close()
+
+        print(f"✅ Ученик ID {student_id} удален")
+        return jsonify({'success': True, 'message': 'Ученик успешно удален'})
+
+    except Exception as e:
+        print(f"❌ Ошибка при удалении ученика: {e}")
+        return jsonify({'success': False, 'message': f'Ошибка при удалении ученика: {str(e)}'}), 500
 
 
 @app.route('/debug/files')
@@ -359,12 +370,85 @@ def reschedule():
     except FileNotFoundError:
         return "Страница запросов на перенос не найдена", 404
 
+@app.route('/add-student')
+def add_student():
+    """Страница добавления нового ученика"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return "Доступ запрещен. Только для репетиторов.", 403
+    return render_template('add_student.html')
+
+@app.route('/api/tutor/create-student', methods=['POST'])
+def api_create_student():
+    """API для создания нового ученика"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
+
+    data = request.get_json()
+
+    print(f"📨 Получены данные для создания ученика: {data}")
+
+    # Валидация данных
+    required_fields = ['last_name', 'first_name', 'birth_date', 'exam_type', 'username', 'password', 'lesson_price', 'day_of_week', 'lesson_time']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({'success': False, 'message': f'Поле {field} обязательно'}), 400
+
+    try:
+        # Формируем contact_info из даты рождения
+        contact_info = f"Дата рождения: {data['birth_date']}"
+
+        # Создаем ученика в базе данных
+        student_id = db.create_student(
+            username=data['username'],
+            password=data['password'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            tutor_id=session['user_id'],
+            contact_info=contact_info,
+            exam_type=data['exam_type'],
+            lesson_price=data['lesson_price'],
+            day_of_week=data['day_of_week'],
+            lesson_time=data['lesson_time']
+        )
+
+        if student_id:
+            print(f"✅ Ученик успешно создан с ID: {student_id}")
+            return jsonify({
+                'success': True,
+                'message': 'Ученик успешно создан',
+                'student_id': student_id
+            })
+        else:
+            print("❌ Ошибка: не удалось создать ученика")
+            return jsonify(
+                {'success': False, 'message': 'Ошибка при создании ученика (возможно, логин уже занят)'}), 500
+
+    except Exception as e:
+        print(f"❌ Ошибка при создании ученика: {e}")
+        return jsonify({'success': False, 'message': f'Внутренняя ошибка сервера: {str(e)}'}), 500
+
+@app.route('/api/tutor/students')
+def api_get_students():
+    """API для получения списка учеников репетитора"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    try:
+        students = db.get_tutor_students(session['user_id'])
+        print(f"✅ Получено учеников: {len(students)}")
+        return jsonify({'success': True, 'students': students})
+
+    except Exception as e:
+        print(f"❌ Ошибка при получении учеников: {e}")
+        return jsonify({'success': False, 'message': 'Ошибка при загрузке учеников'}), 500
+
 @app.route('/income')
 def income():
     """Страница доходов"""
     if 'user_id' not in session or session['role'] != 'tutor':
         return "Доступ запрещен. Только для репетиторов.", 403
     return render_template('income.html')
+
 @app.route('/App.js')
 def serve_app_js():
     """Обслуживание App.js"""
