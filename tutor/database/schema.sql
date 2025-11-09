@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) NOT NULL CHECK (role IN ('tutor', 'student')),
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    exam_type VARCHAR(10) CHECK (exam_type IN ('oge', 'ege')), -- ДОБАВЬТЕ ЭТУ СТРОКУ
+    exam_type VARCHAR(10) CHECK (exam_type IN ('oge', 'ege')),
     lesson_price DECIMAL(10,2) DEFAULT 0.00,
     contact_info TEXT,
     is_active BOOLEAN DEFAULT 1,
@@ -100,15 +100,21 @@ CREATE TABLE IF NOT EXISTS income (
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
 );
 
--- Таблица учебных материалов
+-- Таблица учебных материалов (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 CREATE TABLE IF NOT EXISTS materials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    topic_id INTEGER NOT NULL,
+    tutor_id INTEGER NOT NULL,
     title VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    content_type VARCHAR(50),
+    description TEXT,
+    file_type VARCHAR(10) NOT NULL,
+    file_size VARCHAR(20) DEFAULT '0 MB',
+    file_path TEXT,
+    category VARCHAR(50) DEFAULT 'other',
+    exam_type VARCHAR(10) CHECK(exam_type IN ('oge', 'ege', 'both')) DEFAULT 'both',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_id) REFERENCES users (id) ON DELETE CASCADE
+    ALTER TABLE materials ADD COLUMN download_count INTEGER DEFAULT 0;
 );
 
 -- Создание индексов для оптимизации
@@ -120,6 +126,8 @@ CREATE INDEX IF NOT EXISTS idx_lessons_schedule_id ON lessons(schedule_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_date ON lessons(lesson_date);
 CREATE INDEX IF NOT EXISTS idx_student_progress_student ON student_progress(student_id, topic_id);
 CREATE INDEX IF NOT EXISTS idx_income_month ON income(month_year);
+CREATE INDEX IF NOT EXISTS idx_materials_tutor_id ON materials(tutor_id);
+CREATE INDEX IF NOT EXISTS idx_materials_category ON materials(category);
 
 -- Вставка начальных данных (репетитор по умолчанию)
 INSERT OR IGNORE INTO users (username, password_hash, role, first_name, last_name, lesson_price, contact_info)

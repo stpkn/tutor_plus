@@ -2,24 +2,163 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тесты - Кабинет ученика</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .dashboard-title {
+            color: #FEFCF8 !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h1 {
+            color: #FEFCF8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h2 {
+            color: #FEFCF8;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #FEFCF8;
+            opacity: 0.8;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
-<div class="login-container">
-    <div class="test-block">
-        <h3>Тест 1: Логика и основы кодирования</h3>
-        <p>Поработайте с логическими выражениями.</p>
-        <a href="/tests/1"><button class="login-btn">Перейти</button></a>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>📚 Кабинет ученика</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="dashboard-title">Панель ученика</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="/student-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-cabinet#schedule" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-cabinet#materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="/tests" style="display: block; text-decoration: none; color: inherit;">
+                            🧪 Тесты
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <header class="header">
+                    <div class="header-info">
+                        <h1>🧪 Тесты и задания</h1>
+                        <h2>Проверка знаний</h2>
+                        <p class="subtitle">Выполняйте тесты для проверки своих знаний и подготовки к экзаменам</p>
+                    </div>
+                </header>
+
+                <section class="login-section">
+                    <h2>Доступные тесты</h2>
+                    <div class="login-container">
+                        <div class="test-block">
+                            <h3>Тест 1: Логика и основы кодирования</h3>
+                            <p>Поработайте с логическими выражениями.</p>
+                            <a href="/tests/1"><button class="login-btn">Перейти</button></a>
+                        </div>
+
+                        <div class="test-block">
+                            <h3>Тест 2: Алгоритмы и программирование</h3>
+                            <p>Проверка знаний основ программирования.</p>
+                            <a href="/tests/2"><button class="login-btn">Перейти</button></a>
+                        </div>
+
+                        <div class="test-block">
+                            <h3>Тест 3: Пробник</h3>
+                            <p>Проверьте накопленные за блок знания.</p>
+                            <a href="/tests/3"><button class="login-btn">Перейти</button></a>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="login-section">
+                    <h2>📊 Результаты тестов</h2>
+                    <div class="login-container">
+                        <div class="results-table">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: rgba(136, 116, 107, 0.1);">
+                                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #88746b;">Тест</th>
+                                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #88746b;">Дата прохождения</th>
+                                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #88746b;">Результат</th>
+                                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #88746b;">Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">Тест 1: Логика и основы кодирования</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">15.05.2024</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">85%</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><span style="color: #51cf66;">✓ Завершен</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">Тест 2: Алгоритмы и программирование</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">10.05.2024</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">92%</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><span style="color: #51cf66;">✓ Завершен</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">Тест 3: Пробник</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">-</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;">-</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><span style="color: #ffd43b;">⏳ Не начат</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 
-    <div class="test-block">
-        <h3>Тест 2: Алгоритмы и программирование</h3>
-        <p>Проверка знаний основ программирования.</p>
-        <a href="/tests/2"><button class="login-btn">Перейти</button></a>
-    </div>
-
-    <div class="test-block">
-        <h3> Тест 3: Пробник</h3>
-        <p>Проверьте накопленные за блок знания.</p>
-        <a href="/tests/3"><button class="login-btn">Перейти</button></a>
-    </div>
-</div>
+    <script>
+        // Проверяем авторизацию при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/check-auth')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated || data.user.role !== 'student') {
+                        window.location.href = '/cabinet';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка проверки авторизации:', error);
+                });
+        });
+    </script>
+</body>
+</html>

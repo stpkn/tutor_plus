@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Материалы - Кабинет ученика</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .dashboard-title {
+            color: #FEFCF8 !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h1 {
+            color: #FEFCF8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h2 {
+            color: #FEFCF8;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #FEFCF8;
+            opacity: 0.8;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .materials-container {
+            padding: 20px;
+        }
+
+        .materials-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .materials-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .filter-search {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #88746b;
+            border-radius: 20px;
+            background: white;
+            color: #88746b;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #88746b;
+            border-radius: 20px;
+            padding: 5px 15px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 8px;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(136, 116, 107, 0.2);
+        }
+
+        .material-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .material-header h4 {
+            color: #88746b;
+            margin: 0;
+            font-size: 1.3em;
+            flex: 1;
+        }
+
+        .material-type {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .type-pdf { background: linear-gradient(135deg, #ff6b6b, #fa5252); }
+        .type-presentation { background: linear-gradient(135deg, #339af0, #228be6); }
+        .type-document { background: linear-gradient(135deg, #51cf66, #40c057); }
+        .type-video { background: linear-gradient(135deg, #cc5de8, #be4bdb); }
+        .type-archive { background: linear-gradient(135deg, #868e96, #495057); }
+
+        .material-info {
+            margin-bottom: 20px;
+        }
+
+        .material-info p {
+            margin: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .material-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(136, 116, 107, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #88746b;
+        }
+
+        .material-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-preview {
+            background: linear-gradient(135deg, #339af0, #228be6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(51, 154, 240, 0.4);
+        }
+
+        .empty-materials {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        .empty-materials .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading-materials {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        .loading-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .materials-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .filter-search {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .material-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .material-actions {
+                justify-content: stretch;
+            }
+
+            .material-actions button {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span>📚 Кабинет ученика</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cabinet">Выйти</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="dashboard-title">Панель ученика</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="/student-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-schedule" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="/student-materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-tests" style="display: block; text-decoration: none; color: inherit;">
+                            🧪 Тесты
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="content-area">
+                <header class="header">
+                    <div class="header-info">
+                        <h1>📚 Учебные материалы</h1>
+                        <h2>Ресурсы для обучения</h2>
+                        <p class="subtitle">Доступ к учебным материалам от вашего репетитора</p>
+                    </div>
+                </header>
+
+                <section class="materials-container">
+
+                    <!-- Сетка материалов -->
+                    <div class="materials-grid" id="materialsGrid">
+                        <div class="loading-materials">
+                            <div class="loading-icon">⏳</div>
+                            <h3>Загрузка материалов...</h3>
+                            <p>Пожалуйста, подождите.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allMaterials = [];
+
+        // Загрузка материалов при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMaterials();
+
+            // Добавляем обработчики для фильтрации
+            document.getElementById('categoryFilter').addEventListener('change', filterMaterials);
+            document.getElementById('searchInput').addEventListener('input', filterMaterials);
+        });
+
+        // Загрузка материалов с сервера
+        async function loadMaterials() {
+            const materialsGrid = document.getElementById('materialsGrid');
+
+            try {
+                materialsGrid.innerHTML = `
+                    <div class="loading-materials">
+                        <div class="loading-icon">⏳</div>
+                        <h3>Загрузка материалов...</h3>
+                        <p>Пожалуйста, подождите.</p>
+                    </div>
+                `;
+
+                const response = await fetch('/api/materials');
+                const data = await response.json();
+
+                if (data.success) {
+                    allMaterials = data.materials;
+                    renderMaterials(allMaterials);
+                } else {
+                    showError('Ошибка загрузки материалов');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки материалов:', error);
+                showError('Ошибка загрузки материалов');
+            }
+        }
+
+        // Отображение материалов
+        function renderMaterials(materials) {
+            const materialsGrid = document.getElementById('materialsGrid');
+
+            if (!materials || materials.length === 0) {
+                materialsGrid.innerHTML = `
+                    <div class="empty-materials">
+                        <div class="icon">📚</div>
+                        <h3>Материалы отсутствуют</h3>
+                        <p>Репетитор еще не добавил учебные материалы.</p>
+                        <p>Обратитесь к репетитору для получения доступа к материалам.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let materialsHTML = '';
+
+            materials.forEach(material => {
+                const typeClass = getTypeClass(material.file_type);
+                const typeText = getTypeText(material.file_type);
+                const examType = material.exam_type === 'oge' ? 'ОГЭ' :
+                               material.exam_type === 'ege' ? 'ЕГЭ' : 'ОГЭ/ЕГЭ';
+
+                materialsHTML += `
+                    <div class="material-card">
+                        <div class="material-header">
+                            <h4>${material.title}</h4>
+                            <span class="material-type ${typeClass}">${typeText}</span>
+                        </div>
+                        <div class="material-info">
+                            <p>📄 ${material.file_type.toUpperCase()} документ</p>
+                            <p>📏 Размер: ${material.file_size}</p>
+                            <p>📅 Добавлено: ${formatDate(material.created_at)}</p>
+                            <p>🎯 Для подготовки: ${examType}</p>
+                        </div>
+                        ${material.description ? `
+                        <div class="material-description">
+                            ${material.description}
+                        </div>
+                        ` : ''}
+                        <div class="material-actions">
+                            ${material.file_path ? `
+                            <button class="btn-download" onclick="downloadMaterial(${material.id})">
+                                📥 Скачать
+                            </button>
+                            <button class="btn-preview" onclick="previewMaterial(${material.id})">
+                                👁️ Просмотреть
+                            </button>
+                            ` : `
+                            <button class="btn-download" disabled>
+                                📥 Файл недоступен
+                            </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            materialsGrid.innerHTML = materialsHTML;
+        }
+
+        // Фильтрация материалов
+        function filterMaterials() {
+            const category = document.getElementById('categoryFilter').value;
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            let filteredMaterials = allMaterials;
+
+            // Фильтрация по категории
+            if (category !== 'all') {
+                filteredMaterials = filteredMaterials.filter(material =>
+                    material.category === category
+                );
+            }
+
+            // Поиск по названию и описанию
+            if (searchText) {
+                filteredMaterials = filteredMaterials.filter(material =>
+                    material.title.toLowerCase().includes(searchText) ||
+                    (material.description && material.description.toLowerCase().includes(searchText))
+                );
+            }
+
+            renderMaterials(filteredMaterials);
+        }
+
+        // Вспомогательные функции
+        function getTypeClass(fileType) {
+            const typeMap = {
+                'pdf': 'type-pdf',
+                'ppt': 'type-presentation',
+                'pptx': 'type-presentation',
+                'doc': 'type-document',
+                'docx': 'type-document',
+                'mp4': 'type-video',
+                'avi': 'type-video',
+                'zip': 'type-archive',
+                'rar': 'type-archive'
+            };
+            return typeMap[fileType] || 'type-document';
+        }
+
+        function getTypeText(fileType) {
+            const typeMap = {
+                'pdf': 'PDF',
+                'ppt': 'Презентация',
+                'pptx': 'Презентация',
+                'doc': 'Документ',
+                'docx': 'Документ',
+                'mp4': 'Видео',
+                'avi': 'Видео',
+                'zip': 'Архив',
+                'rar': 'Архив'
+            };
+            return typeMap[fileType] || 'Документ';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        function downloadMaterial(materialId) {
+            alert(`Начато скачивание материала #${materialId}`);
+            // Здесь будет логика скачивания файла
+        }
+
+        function previewMaterial(materialId) {
+            alert(`Просмотр материала #${materialId}`);
+            // Здесь будет логика предпросмотра файла
+        }
+
+        function showError(message) {
+            const materialsGrid = document.getElementById('materialsGrid');
+            materialsGrid.innerHTML = `
+                <div class="empty-materials">
+                    <div class="icon">❌</div>
+                    <h3>Ошибка загрузки</h3>
+                    <p>${message}</p>
+                    <button class="btn-download" onclick="loadMaterials()" style="margin-top: 15px;">
+                        🔄 Попробовать снова
+                    </button>
+                </div>
+            `;
+        }
+
+        // Проверяем авторизацию при загрузке
+        fetch('/api/check-auth')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.authenticated || data.user.role !== 'student') {
+                    window.location.href = '/cabinet';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка проверки авторизации:', error);
+            });
+
+        // Автообновление материалов каждые 30 секунд
+        setInterval(loadMaterials, 30000);
+    </script>
+</body>
+</html>
