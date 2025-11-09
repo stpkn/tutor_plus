@@ -2,47 +2,24 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Тестирования</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-    <div class="container">
-        <nav class="navbar">
-            <div class="nav-brand"><span> Тестирования</span></div>
-            <ul class="nav-menu">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/cabinet">Кабинет</a></li>
-            </ul>
-        </nav>
-
-        <header class="header">
-            <div class="header-info">
-                <h1> Тестирования по материалам</h1>
-                <h2>Выберите тест для прохождения</h2>
-            </div>
-        </header>
-
-        <section class="login-section">
-            <div class="login-container">
-                <div class="test-block" onclick="alert('Этот тест пока не активен')">
-                    <h3> Тест 1: Логика и основы кодирования </h3>
-                    <p>Поработайте с логическими выражениями.</p>
-                    <button class="login-btn">Перейти</button>
-                </div>
-
-                <div class="test-block" onclick="alert('Этот тест пока не активен')">
-                    <h3> Тест 2: Алгоритмы и программирование </h3>
-                    <p>Проверьте знание основ программирования.</p>
-                    <button class="login-btn">Перейти</button>
-                </div>
-
-                <div class="test-block" onclick="alert('Этот тест пока не активен')">
-                    <h3> Тест 3: Пробник </h3>
-                    <p>Проверьте накопленные за семестр знания.</p>
-                    <button class="login-btn">Перейти</button>
-                </div>
-            </div>
-        </section>
+<div class="login-container">
+    <div class="test-block">
+        <h3>Тест 1: Логика и основы кодирования</h3>
+        <p>Поработайте с логическими выражениями.</p>
+        <a href="/tests/1"><button class="login-btn">Перейти</button></a>
     </div>
-</body>
-</html>
+
+    <div class="test-block">
+        <h3>Тест 2: Алгоритмы и программирование</h3>
+        <p>Проверка знаний основ программирования.</p>
+        <a href="/tests/2"><button class="login-btn">Перейти</button></a>
+    </div>
+
+    <div class="test-block">
+        <h3> Тест 3: Пробник</h3>
+        <p>Проверьте накопленные за блок знания.</p>
+        <a href="/tests/3"><button class="login-btn">Перейти</button></a>
+    </div>
+</div>

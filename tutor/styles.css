@@ -1079,3 +1079,29 @@ section h2::after {
         justify-content: flex-start;
     }
 }
+
+
+/*тесты*/
+.test-block {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    text-align: left;
+    background: #f9f9f9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.test-block:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.test-block h3 {
+    margin-top: 0;
+}
+
+.test-block button {
+    margin-top: 10px;
+}
