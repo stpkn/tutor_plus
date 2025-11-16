@@ -4,7 +4,7 @@ import uuid
 from werkzeug.utils import secure_filename
 from database.database import Database
 from services.auth_service import AuthService
-from flask import send_file, send_from_directory
+from llm.llm_client import generate_test_from_text
 
 # Инициализация БД
 db = Database('database/tutoring.db')
@@ -13,6 +13,8 @@ auth_service = AuthService(db)
 # Создаем таблицы при запуске
 db.create_tables()
 db.update_schema()
+# Гарантируем наличие пользователя tutor
+db.ensure_tutor_user()
 
 app = Flask(__name__)
 app.secret_key = 'tutoring-secret-key-2024'
@@ -499,10 +501,35 @@ def student_tests():
     return render_template('student_tests.html')
 
 
-@app.route('/tests')
-def tests_old():
-    """Старая страница тестов (для обратной совместимости)"""
-    return render_template('tests.html')
+@app.route('/test-result')
+def test_result():
+    """Страница с результатами генерации теста"""
+    generated_test = session.get('generated_test', '')
+    test_material = session.get('test_material', '')
+
+    if not generated_test:
+        return "Результаты не найдены. Пожалуйста, сгенерируйте тест сначала.", 404
+
+    return render_template('test_result.html', test=generated_test, material=test_material)
+
+
+@app.route('/generate-test', methods=['POST'])
+def generate_test():
+    """Генерация теста из материала"""
+    data = request.get_json()
+    material = data.get("text", "")
+    material_name = data.get("material_name", "z5")  # По умолчанию "z5"
+
+    if not material:
+        return jsonify({"test": "❌ Ошибка: Не указан материал для генерации теста"}), 400
+
+    result = generate_test_from_text(material, material_name=material_name)
+
+    # Сохраняем результат в сессии для отображения на отдельной странице
+    session['generated_test'] = result
+    session['test_material'] = material
+
+    return jsonify({"test": result, "redirect": "/test-result"})
 
 
 @app.route('/student-schedule')
@@ -698,9 +725,9 @@ def download_material(material_id):
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM materials WHERE id = ?", (material_id,))
         material = cursor.fetchone()
-        connection.close()
 
         if not material:
+            connection.close()
             return jsonify({'error': 'Материал не найден'}), 404
 
         material_dict = dict(material)
@@ -713,7 +740,10 @@ def download_material(material_id):
                 WHERE u.id = ? AND u.created_by = ?
             """, (session['user_id'], material_dict['tutor_id']))
             if not cursor.fetchone():
+                connection.close()
                 return jsonify({'error': 'Доступ запрещен'}), 403
+
+        connection.close()
 
         file_path = material_dict['file_path']
 

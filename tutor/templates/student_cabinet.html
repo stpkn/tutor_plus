@@ -129,6 +129,64 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .access-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: block;
+        }
+
+        .access-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(136, 116, 107, 0.2);
+        }
+
+        .access-card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .access-card h3 {
+            color: #88746b;
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .access-card p {
+            color: #666;
+            margin: 0;
+            font-size: 0.95em;
+        }
+
+        .recent-activity {
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
@@ -190,20 +248,54 @@
                         <div class="stat-card">
                             <div class="stat-icon">📅</div>
                             <h3>Занятий всего</h3>
-                            <p class="stat-number">3</p>
+                            <p class="stat-number" id="lessonsCount">0</p>
                             <p class="stat-description">проведено</p>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">📚</div>
                             <h3>Доступных материалов</h3>
-                            <p class="stat-number">24</p>
+                            <p class="stat-number" id="materialsCount">0</p>
                             <p class="stat-description">документов</p>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">🧪</div>
                             <h3>Пройдено тестов</h3>
-                            <p class="stat-number">8</p>
-                            <p class="stat-description">средний балл: 85%</p>
+                            <p class="stat-number" id="testsCount">0</p>
+                            <p class="stat-description">средний балл: <span id="avgScore">-</span>%</p>
+                        </div>
+                    </section>
+
+                    <!-- Быстрый доступ к разделам -->
+                    <section class="quick-access">
+                        <a href="/student-schedule" class="access-card">
+                            <div class="access-card-icon">📅</div>
+                            <h3>Моё расписание</h3>
+                            <p>Просмотр запланированных занятий с репетитором</p>
+                        </a>
+                        <a href="/student-tests" class="access-card">
+                            <div class="access-card-icon">🧪</div>
+                            <h3>Тесты и задания</h3>
+                            <p>Выполнение тестов для проверки знаний</p>
+                        </a>
+                        <a href="/student-materials" class="access-card">
+                            <div class="access-card-icon">📚</div>
+                            <h3>Учебные материалы</h3>
+                            <p>Доступ к учебным материалам и файлам</p>
+                        </a>
+                    </section>
+
+                    <!-- Последняя активность -->
+                    <section class="recent-activity">
+                        <h2 style="color: #88746b; margin-bottom: 20px;">📋 Последняя активность</h2>
+                        <div class="activity-list" id="activityList">
+                            <div class="activity-item">
+                                <div class="activity-icon">📅</div>
+                                <div class="activity-content">
+                                    <strong>Добро пожаловать!</strong>
+                                    <p>Начните работу с просмотра расписания или прохождения тестов</p>
+                                </div>
+                                <div class="activity-time">Сегодня</div>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -226,20 +318,33 @@
                 }
             });
 
-            // Добавляем обработчики для карточек быстрого доступа
-            document.querySelectorAll('.course-card').forEach(card => {
-                card.style.cursor = 'pointer';
-                card.style.transition = 'all 0.3s ease';
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                    this.style.boxShadow = '0 10px 25px rgba(136, 116, 107, 0.2)';
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 5px 20px rgba(136, 116, 107, 0.15)';
-                });
-            });
+            // Загружаем статистику
+            loadStats();
         });
+
+        // Загрузка статистики
+        async function loadStats() {
+            try {
+                // Загружаем расписание для подсчета занятий
+                const scheduleResponse = await fetch('/api/schedule');
+                const scheduleData = await scheduleResponse.json();
+                const lessonsCount = scheduleData.schedule ? scheduleData.schedule.length : 0;
+                document.getElementById('lessonsCount').textContent = lessonsCount;
+
+                // Загружаем материалы
+                const materialsResponse = await fetch('/api/materials');
+                const materialsData = await materialsResponse.json();
+                const materialsCount = materialsData.materials ? materialsData.materials.length : 0;
+                document.getElementById('materialsCount').textContent = materialsCount;
+
+                // Тесты (пока заглушка)
+                document.getElementById('testsCount').textContent = '0';
+                document.getElementById('avgScore').textContent = '-';
+
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
 
         // Проверяем авторизацию при загрузке
         fetch('/api/check-auth')
