@@ -271,52 +271,10 @@ def student_cabinet():
         return "Доступ запрещен. Только для учеников.", 403
 
     try:
-        with open('templates/student_cabinet.html', 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        # Если файл не найден, создаем простую страницу
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Кабинет ученика</title>
-            <link rel="stylesheet" href="/styles.css">
-        </head>
-        <body>
-            <div class="container">
-                <nav class="navbar">
-                    <div class="nav-brand"><span>📚 Кабинет ученика</span></div>
-                    <ul class="nav-menu">
-                        <li><a href="/">Главная</a></li>
-                        <li><a href="/cabinet">Выйти</a></li>
-                    </ul>
-                </nav>
-                <header class="header">
-                    <div class="header-info">
-                        <h1>Добро пожаловать, ученик!</h1>
-                        <h2>Вы успешно вошли в систему</h2>
-                        <p>ID: {session.get('user_id')}, Имя: {session.get('first_name')} {session.get('last_name')}</p>
-                    </div>
-                </header>
-                <section class="login-section">
-                    <h2>🎉 Поздравляем! Система аутентификации работает!</h2>
-                    <div class="login-container">
-                        <p><strong>Ученик:</strong> {session.get('first_name')} {session.get('last_name')}</p>
-                        <p><strong>Логин:</strong> {session.get('username')}</p>
-                        <p><strong>ID:</strong> {session.get('user_id')}</p>
-                        <p>Основной кабинет будет доступен после настройки шаблонов.</p>
-                        <button onclick="logout()" class="login-btn">Выйти</button>
-                    </div>
-                </section>
-            </div>
-            <script>
-                function logout() {{
-                    fetch('/api/logout', {{method: 'POST'}}).then(() => window.location.href = '/cabinet');
-                }}
-            </script>
-        </body>
-        </html>
-        """
+        return render_template('student_cabinet.html')
+    except Exception as e:
+        print(f"❌ Ошибка при рендеринге шаблона: {e}")
+        return f"Ошибка загрузки страницы: {e}", 500
 
 @app.route('/tests')
 #тесты
@@ -325,7 +283,41 @@ def tests():
 
 @app.route('/tests/1')
 def test_1():
-    return render_template('test_1.html')
+    """Тест 1 - генерация на основе материала z5.txt"""
+    if 'user_id' not in session:
+        return "Доступ запрещен. Необходима авторизация.", 403
+    
+    try:
+        # Загружаем материал z5.txt
+        # Путь относительно директории, где находится app.py (tutor/)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        material_path = os.path.join(base_dir, 'llm', 'materials', 'z5.txt')
+        
+        if not os.path.exists(material_path):
+            return f"❌ Файл материала не найден: {material_path}\nТекущая директория: {os.getcwd()}", 404
+        
+        with open(material_path, 'r', encoding='utf-8') as f:
+            material_text = f.read()
+        
+        # Генерируем тест на основе материала
+        print(f"📝 Генерация теста из материала z5.txt...")
+        generated_test = generate_test_from_text(material_text, material_name="z5")
+        
+        # Сохраняем в сессии для отображения
+        session['generated_test'] = generated_test
+        session['test_material'] = material_text
+        session['test_material_name'] = 'z5'
+        
+        return render_template('test_1.html', 
+                             test=generated_test, 
+                             material=material_text,
+                             material_name='z5')
+    
+    except Exception as e:
+        print(f"❌ Ошибка при генерации теста: {e}")
+        import traceback
+        traceback.print_exc()
+        return f"Ошибка при генерации теста: {str(e)}", 500
 
 @app.route('/tests/2')
 def test_2():
