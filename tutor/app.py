@@ -1,5 +1,7 @@
 from flask import Flask, render_template, send_from_directory, send_file, request, jsonify, session
 import os
+import uuid
+from werkzeug.utils import secure_filename
 from database.database import Database
 from services.auth_service import AuthService
 # Инициализация БД
@@ -9,6 +11,8 @@ auth_service = AuthService(db)
 # Создаем таблицы при запуске
 db.create_tables()
 db.update_schema()
+# Гарантируем наличие пользователя tutor
+db.ensure_tutor_user()
 
 app = Flask(__name__)
 app.secret_key = 'tutoring-secret-key-2024'
@@ -281,57 +285,61 @@ def student_cabinet():
         return "Доступ запрещен. Только для учеников.", 403
 
     try:
-        with open('templates/student_cabinet.html', 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        # Если файл не найден, создаем простую страницу
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Кабинет ученика</title>
-            <link rel="stylesheet" href="/styles.css">
-        </head>
-        <body>
-            <div class="container">
-                <nav class="navbar">
-                    <div class="nav-brand"><span>📚 Кабинет ученика</span></div>
-                    <ul class="nav-menu">
-                        <li><a href="/">Главная</a></li>
-                        <li><a href="/cabinet">Выйти</a></li>
-                    </ul>
-                </nav>
-                <header class="header">
-                    <div class="header-info">
-                        <h1>Добро пожаловать, ученик!</h1>
-                        <h2>Вы успешно вошли в систему</h2>
-                        <p>ID: {session.get('user_id')}, Имя: {session.get('first_name')} {session.get('last_name')}</p>
-                    </div>
-                </header>
-                <section class="login-section">
-                    <h2>🎉 Поздравляем! Система аутентификации работает!</h2>
-                    <div class="login-container">
-                        <p><strong>Ученик:</strong> {session.get('first_name')} {session.get('last_name')}</p>
-                        <p><strong>Логин:</strong> {session.get('username')}</p>
-                        <p><strong>ID:</strong> {session.get('user_id')}</p>
-                        <p>Основной кабинет будет доступен после настройки шаблонов.</p>
-                        <button onclick="logout()" class="login-btn">Выйти</button>
-                    </div>
-                </section>
-            </div>
-            <script>
-                function logout() {{
-                    fetch('/api/logout', {{method: 'POST'}}).then(() => window.location.href = '/cabinet');
-                }}
-            </script>
-        </body>
-        </html>
-        """
+        return render_template('student_cabinet.html')
+    except Exception as e:
+        print(f"❌ Ошибка при рендеринге шаблона: {e}")
+        return f"Ошибка загрузки страницы: {e}", 500
 
 @app.route('/tests')
 #тесты
 def tests():
     return render_template('tests.html')
+
+@app.route('/tests/1')
+def test_1():
+    """Тест 1 - генерация на основе материала z5.txt"""
+    if 'user_id' not in session:
+        return "Доступ запрещен. Необходима авторизация.", 403
+    
+    try:
+        # Загружаем материал z5.txt
+        # Путь относительно директории, где находится app.py (tutor/)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        material_path = os.path.join(base_dir, 'llm', 'materials', 'z5.txt')
+        
+        if not os.path.exists(material_path):
+            return f"❌ Файл материала не найден: {material_path}\nТекущая директория: {os.getcwd()}", 404
+        
+        with open(material_path, 'r', encoding='utf-8') as f:
+            material_text = f.read()
+        
+        # Генерируем тест на основе материала
+        print(f"📝 Генерация теста из материала z5.txt...")
+        generated_test = generate_test_from_text(material_text, material_name="z5")
+        
+        # Сохраняем в сессии для отображения
+        session['generated_test'] = generated_test
+        session['test_material'] = material_text
+        session['test_material_name'] = 'z5'
+        
+        return render_template('test_1.html', 
+                             test=generated_test, 
+                             material=material_text,
+                             material_name='z5')
+    
+    except Exception as e:
+        print(f"❌ Ошибка при генерации теста: {e}")
+        import traceback
+        traceback.print_exc()
+        return f"Ошибка при генерации теста: {str(e)}", 500
+
+@app.route('/tests/2')
+def test_2():
+    return render_template('test_2.html')
+
+@app.route('/tests/3')
+def test_3():
+    return render_template('test_3.html')
 
 @app.route('/timetable')
 #расписание
@@ -489,9 +497,387 @@ def students():
         return "Доступ запрещен. Только для репетиторов.", 403
     return render_template('students.html')
 
+
+@app.route('/student-tests')
+def student_tests():
+    """Страница тестов с меню для учеников"""
+    if 'user_id' not in session or session['role'] != 'student':
+        return "Доступ запрещен. Только для учеников.", 403
+
+    return render_template('student_tests.html')
+
+
+@app.route('/test-result')
+def test_result():
+    """Страница с результатами генерации теста"""
+    generated_test = session.get('generated_test', '')
+    test_material = session.get('test_material', '')
+
+    if not generated_test:
+        return "Результаты не найдены. Пожалуйста, сгенерируйте тест сначала.", 404
+
+    return render_template('test_result.html', test=generated_test, material=test_material)
+
+
+@app.route('/generate-test', methods=['POST'])
+def generate_test():
+    """Генерация теста из материала"""
+    data = request.get_json()
+    material = data.get("text", "")
+    material_name = data.get("material_name", "z5")  # По умолчанию "z5"
+
+    if not material:
+        return jsonify({"test": "❌ Ошибка: Не указан материал для генерации теста"}), 400
+
+    result = generate_test_from_text(material, material_name=material_name)
+
+    # Сохраняем результат в сессии для отображения на отдельной странице
+    session['generated_test'] = result
+    session['test_material'] = material
+
+    return jsonify({"test": result, "redirect": "/test-result"})
+
+
+@app.route('/student-schedule')
+def student_schedule():
+    """Страница расписания для учеников"""
+    if 'user_id' not in session or session['role'] != 'student':
+        return "Доступ запрещен. Только для учеников.", 403
+
+    return render_template('student_schedule.html')
+
+
+@app.route('/student-materials')
+def student_materials():
+    """Страница материалов для учеников"""
+    if 'user_id' not in session or session['role'] != 'student':
+        return "Доступ запрещен. Только для учеников.", 403
+
+    return render_template('student_materials.html')
+
+
+@app.route('/api/materials')
+def api_get_materials():
+    """API для получения учебных материалов"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Не авторизован'}), 401
+
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+
+        if session['role'] == 'tutor':
+            # Репетитор видит все свои материалы
+            cursor.execute("""
+                SELECT * FROM materials 
+                WHERE tutor_id = ? 
+                ORDER BY created_at DESC
+            """, (session['user_id'],))
+        else:
+            # Ученик видит материалы своего репетитора
+            cursor.execute("""
+                SELECT m.* 
+                FROM materials m
+                JOIN users u ON m.tutor_id = u.created_by
+                WHERE u.id = ?
+                ORDER BY m.created_at DESC
+            """, (session['user_id'],))
+
+        materials = [dict(row) for row in cursor.fetchall()]
+        connection.close()
+
+        return jsonify({
+            'success': True,
+            'materials': materials
+        })
+
+    except Exception as e:
+        print(f"❌ Ошибка получения материалов: {e}")
+        # Возвращаем тестовые данные если таблицы еще нет
+        return jsonify({
+            'success': True,
+            'materials': []
+        })
+
+@app.route('/api/tutor/materials', methods=['POST'])
+def api_create_material():
+    """API для создания учебного материала (только для репетитора)"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    data = request.get_json()
+
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            INSERT INTO materials (tutor_id, title, description, file_type, file_size, file_path, category, exam_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            session['user_id'],
+            data['title'],
+            data.get('description', ''),
+            data['file_type'],
+            data.get('file_size', '0 MB'),
+            data.get('file_path', ''),
+            data.get('category', 'other'),
+            data.get('exam_type', 'both')
+        ))
+
+        material_id = cursor.lastrowid
+        connection.commit()
+        connection.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Материал успешно создан',
+            'material_id': material_id
+        })
+
+    except Exception as e:
+        print(f"❌ Ошибка создания материала: {e}")
+        return jsonify({'success': False, 'message': 'Ошибка создания материала'}), 500
+
+
+UPLOAD_FOLDER = 'uploads/materials'
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'zip', 'rar'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/api/tutor/upload-material', methods=['POST'])
+def api_upload_material():
+    """API для загрузки учебного материала"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
+
+    try:
+        # Проверяем наличие файла
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'Файл не выбран'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'Файл не выбран'}), 400
+
+        if file and allowed_file(file.filename):
+            # Создаем уникальное имя файла
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+
+            # Создаем папку если не существует
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+
+            # Сохраняем файл
+            file.save(file_path)
+
+            # Получаем данные из формы
+            title = request.form.get('title')
+            description = request.form.get('description', '')
+            category = request.form.get('category', 'other')
+            exam_type = request.form.get('exam_type', 'both')
+
+            # Получаем размер файла
+            file_size = f"{os.path.getsize(file_path) / 1024 / 1024:.1f} MB"
+            file_type = filename.rsplit('.', 1)[1].lower()
+
+            # Сохраняем в базу данных
+            connection = db.get_connection()
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                INSERT INTO materials (tutor_id, title, description, file_type, file_size, file_path, category, exam_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                session['user_id'],
+                title,
+                description,
+                file_type,
+                file_size,
+                file_path,
+                category,
+                exam_type
+            ))
+
+            material_id = cursor.lastrowid
+            connection.commit()
+            connection.close()
+
+            print(f"✅ Материал загружен: {title} (ID: {material_id})")
+
+            return jsonify({
+                'success': True,
+                'message': 'Материал успешно загружен',
+                'material_id': material_id
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Недопустимый тип файла'}), 400
+
+    except Exception as e:
+        print(f"❌ Ошибка загрузки материала: {e}")
+        return jsonify({'success': False, 'message': f'Ошибка загрузки: {str(e)}'}), 500
+
+
+@app.route('/api/materials/<int:material_id>/download')
+def download_material(material_id):
+    """Скачивание материала"""
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM materials WHERE id = ?", (material_id,))
+        material = cursor.fetchone()
+
+        if not material:
+            connection.close()
+            return jsonify({'error': 'Материал не найден'}), 404
+
+        material_dict = dict(material)
+
+        # Проверяем права доступа
+        if session['role'] == 'student':
+            # Ученик может скачивать только материалы своего репетитора
+            cursor.execute("""
+                SELECT u.created_by FROM users u 
+                WHERE u.id = ? AND u.created_by = ?
+            """, (session['user_id'], material_dict['tutor_id']))
+            if not cursor.fetchone():
+                connection.close()
+                return jsonify({'error': 'Доступ запрещен'}), 403
+
+        connection.close()
+
+        file_path = material_dict['file_path']
+
+        if not file_path or not os.path.exists(file_path):
+            # Если файла нет, создаем временный файл с информацией
+            temp_content = f"Материал: {material_dict['title']}\n\n"
+            temp_content += f"Описание: {material_dict.get('description', '')}\n"
+            temp_content += f"Тип: {material_dict['file_type']}\n"
+            temp_content += f"Дата создания: {material_dict['created_at']}"
+
+            temp_filename = f"material_{material_id}.txt"
+            temp_path = os.path.join(UPLOAD_FOLDER, temp_filename)
+
+            with open(temp_path, 'w', encoding='utf-8') as f:
+                f.write(temp_content)
+
+            return send_file(temp_path, as_attachment=True, download_name=f"{material_dict['title']}.txt")
+
+        return send_file(file_path, as_attachment=True,
+                         download_name=f"{material_dict['title']}.{material_dict['file_type']}")
+
+    except Exception as e:
+        print(f"❌ Ошибка скачивания материала: {e}")
+        return jsonify({'error': 'Ошибка скачивания'}), 500
+
+
+@app.route('/api/materials/<int:material_id>/preview')
+def preview_material(material_id):
+    """Просмотр материала"""
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM materials WHERE id = ?", (material_id,))
+        material = cursor.fetchone()
+        connection.close()
+
+        if not material:
+            return jsonify({'error': 'Материал не найден'}), 404
+
+        material_dict = dict(material)
+        file_path = material_dict['file_path']
+
+        if not file_path or not os.path.exists(file_path):
+            return jsonify({'error': 'Файл не найден'}), 404
+
+        # Для PDF файлов отправляем как PDF
+        if material_dict['file_type'] == 'pdf':
+            return send_file(file_path, mimetype='application/pdf')
+
+        # Для текстовых файлов
+        elif material_dict['file_type'] == 'txt':
+            return send_file(file_path, mimetype='text/plain')
+
+        # Для других типов предлагаем скачать
+        else:
+            return send_file(file_path, as_attachment=True,
+                             download_name=f"{material_dict['title']}.{material_dict['file_type']}")
+
+    except Exception as e:
+        print(f"❌ Ошибка просмотра материала: {e}")
+        return jsonify({'error': 'Ошибка просмотра'}), 500
+
+
+@app.route('/api/tutor/materials/<int:material_id>', methods=['DELETE'])
+def delete_material(material_id):
+    """Удаление материала (только для репетитора)"""
+    if 'user_id' not in session or session['role'] != 'tutor':
+        return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
+
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+
+        # Проверяем, что материал принадлежит текущему репетитору
+        cursor.execute("SELECT * FROM materials WHERE id = ? AND tutor_id = ?", (material_id, session['user_id']))
+        material = cursor.fetchone()
+
+        if not material:
+            return jsonify({'success': False, 'message': 'Материал не найден'}), 404
+
+        material_dict = dict(material)
+
+        # Удаляем файл с диска
+        file_path = material_dict['file_path']
+        if file_path and os.path.exists(file_path):
+            os.remove(file_path)
+
+        # Удаляем запись из базы данных
+        cursor.execute("DELETE FROM materials WHERE id = ?", (material_id,))
+        connection.commit()
+        connection.close()
+
+        print(f"✅ Материал удален: {material_dict['title']} (ID: {material_id})")
+
+        return jsonify({
+            'success': True,
+            'message': 'Материал успешно удален'
+        })
+
+    except Exception as e:
+        print(f"❌ Ошибка удаления материала: {e}")
+        return jsonify({'success': False, 'message': f'Ошибка удаления: {str(e)}'}), 500
+
+
+@app.route('/api/materials/<int:material_id>/download-stats', methods=['POST'])
+def update_download_stats(material_id):
+    """Обновление статистики скачиваний"""
+    try:
+        connection = db.get_connection()
+        cursor = connection.cursor()
+
+        # Здесь можно добавить логику для отслеживания статистики скачиваний
+        # Например, создать таблицу download_stats или обновлять поле в materials
+        cursor.execute("UPDATE materials SET download_count = COALESCE(download_count, 0) + 1 WHERE id = ?",
+                       (material_id,))
+
+        connection.commit()
+        connection.close()
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        print(f"❌ Ошибка обновления статистики: {e}")
+        return jsonify({'success': False}), 500
+
 if __name__ == '__main__':
-    print("🚀 Flask сервер запущен!")
-    print("📱 Откройте: http://localhost:5000")
-    print("🎯 Тестовые данные:")
-    print("   Репетитор: логин 'tutor', пароль 'tutor'")
+    print("Flask сервер запущен!")
+    print("Откройте: http://localhost:5000")
+    print("Тестовые данные:")
+    print("Репетитор: логин 'tutor', пароль 'tutor'")
     app.run(debug=True, host='0.0.0.0', port=5000)

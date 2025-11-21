@@ -5,11 +5,24 @@ from typing import Optional, Dict, Any
 
 class Database:
     def __init__(self, db_path='database/tutoring.db'):
-        self.db_path = db_path
+        # Если путь относительный, делаем его абсолютным относительно текущего файла
+        if not os.path.isabs(db_path):
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # Если путь начинается с 'database/', ищем относительно текущего файла
+            if db_path.startswith('database/'):
+                self.db_path = os.path.join(current_dir, os.path.basename(db_path))
+            else:
+                self.db_path = os.path.join(os.path.dirname(current_dir), db_path)
+        else:
+            self.db_path = db_path
+        print(f"📂 Путь к базе данных: {self.db_path}")
 
     def get_connection(self):
         try:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            # Создаем директорию для базы данных, если её нет
+            db_dir = os.path.dirname(self.db_path)
+            if db_dir:
+                os.makedirs(db_dir, exist_ok=True)
             connection = sqlite3.connect(self.db_path)
             connection.row_factory = sqlite3.Row
             return connection
@@ -24,15 +37,24 @@ class Database:
         """Создание таблиц из SQL скрипта"""
         connection = self.get_connection()
         if not connection:
+            print("❌ Не удалось подключиться к базе данных")
             return
 
         try:
-            if not os.path.exists('database/schema.sql'):
-                print("❌ Файл database/schema.sql не найден!")
+            # Определяем путь к schema.sql относительно текущего файла database.py
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            schema_path = os.path.join(current_dir, 'schema.sql')
+            
+            if not os.path.exists(schema_path):
+                print(f"❌ Файл schema.sql не найден!")
+                print(f"   Искали в: {schema_path}")
+                print(f"   Текущая директория файла: {current_dir}")
+                print(f"   Рабочая директория: {os.getcwd()}")
+                print(f"   Содержимое директории database: {os.listdir(current_dir) if os.path.exists(current_dir) else 'не существует'}")
                 return
 
-            print("📁 Чтение database/schema.sql...")
-            with open('database/schema.sql', 'r', encoding='utf-8') as f:
+            print(f"📁 Чтение {schema_path}...")
+            with open(schema_path, 'r', encoding='utf-8') as f:
                 sql_script = f.read()
                 print(f"📄 Размер скрипта: {len(sql_script)} символов")
 
@@ -41,13 +63,22 @@ class Database:
             connection.commit()
             print("✅ Таблицы созданы")
 
-            # Проверка, создался ли пользователь tutor
-            cursor.execute("SELECT COUNT(*) as count FROM users WHERE username = 'tutor'")
-            result = cursor.fetchone()
-            print(f"👤 Пользователей 'tutor' в базе: {result['count']}")
+            # Проверка, создалась ли таблица users
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+            table_exists = cursor.fetchone()
+            if table_exists:
+                print("✅ Таблица users существует")
+                # Проверка, создался ли пользователь tutor
+                cursor.execute("SELECT COUNT(*) as count FROM users WHERE username = 'tutor'")
+                result = cursor.fetchone()
+                print(f"👤 Пользователей 'tutor' в базе: {result['count']}")
+            else:
+                print("❌ Таблица users не создана!")
 
         except Exception as e:
             print(f"❌ Ошибка создания таблиц: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             connection.close()
 
@@ -205,6 +236,49 @@ class Database:
 
         except sqlite3.Error as e:
             print(f"❌ Ошибка обновления схемы: {e}")
+            return False
+        finally:
+            connection.close()
+
+    def ensure_tutor_user(self):
+        """Создание пользователя tutor, если его нет"""
+        connection = self.get_connection()
+        if not connection:
+            return False
+
+        try:
+            cursor = connection.cursor()
+            
+            # Проверяем, существует ли пользователь tutor
+            cursor.execute("SELECT id FROM users WHERE username = 'tutor'")
+            tutor = cursor.fetchone()
+            
+            if not tutor:
+                print("👤 Создаем пользователя tutor...")
+                cursor.execute("""
+                    INSERT INTO users (username, password_hash, role, first_name, last_name, lesson_price, contact_info, is_active)
+                    VALUES ('tutor', 'tutor', 'tutor', 'Главный', 'Репетитор', 1500.00, 'tutor@example.com', 1)
+                """)
+                connection.commit()
+                print("✅ Пользователь tutor создан")
+                return True
+            else:
+                tutor_dict = dict(tutor)
+                print(f"✅ Пользователь tutor уже существует (ID: {tutor_dict['id']})")
+                # Обновляем пароль и статус на случай, если они были изменены
+                cursor.execute("""
+                    UPDATE users 
+                    SET password_hash = 'tutor', 
+                        is_active = 1,
+                        role = 'tutor'
+                    WHERE username = 'tutor'
+                """)
+                connection.commit()
+                print("✅ Данные пользователя tutor обновлены")
+                return True
+
+        except sqlite3.Error as e:
+            print(f"❌ Ошибка создания пользователя tutor: {e}")
             return False
         finally:
             connection.close()

@@ -5,6 +5,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кабинет ученика</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .dashboard-title {
+            color: #FEFCF8 !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h1 {
+            color: #FEFCF8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-info h2 {
+            color: #FEFCF8;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #FEFCF8;
+            opacity: 0.8;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #88746b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .stat-card h3 {
+            color: #88746b;
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #88746b;
+            margin: 0;
+        }
+
+        .stat-description {
+            color: #666;
+            font-size: 0.9em;
+            margin: 10px 0 0 0;
+        }
+
+        .recent-activity {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recent-activity::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .activity-icon {
+            font-size: 1.5em;
+            width: 40px;
+            text-align: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content strong {
+            color: #88746b;
+        }
+
+        .activity-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .access-card {
+            background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #88746b;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: block;
+        }
+
+        .access-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #88746b, #6B5B73);
+        }
+
+        .access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(136, 116, 107, 0.2);
+        }
+
+        .access-card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .access-card h3 {
+            color: #88746b;
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .access-card p {
+            color: #666;
+            margin: 0;
+            font-size: 0.95em;
+        }
+
+        .recent-activity {
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,97 +201,149 @@
             </ul>
         </nav>
 
-        <header class="header">
-            <div class="header-info">
-                <h1>Добро пожаловать в кабинет ученика!</h1>
-                <h2>Обучение и прогресс</h2>
-                <p class="subtitle">Здесь вы можете просматривать расписание, домашние задания и свой прогресс</p>
+        <div class="main-container">
+            <!-- Боковое меню -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="dashboard-title">Панель ученика</h3>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active">
+                        <a href="/student-cabinet" style="display: block; text-decoration: none; color: inherit;">
+                            📊 Обзор
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-schedule" style="display: block; text-decoration: none; color: inherit;">
+                            📅 Расписание
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-materials" style="display: block; text-decoration: none; color: inherit;">
+                            📚 Материалы
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/student-tests" style="display: block; text-decoration: none; color: inherit;">
+                            🧪 Тесты
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </header>
 
-        <section class="course-info">
-            <h2>📚 Моё обучение</h2>
-            <div class="course-grid">
-                <div class="course-card">
-                    <h3>Моё расписание</h3>
-                    <p>Просмотр вашего расписания занятий</p>
-                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('schedule')">
-                        Посмотреть расписание
-                    </button>
-                </div>
-                <div class="course-card">
-                    <h3>Домашние задания</h3>
-                    <p>Просмотр и выполнение домашних заданий</p>
-                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('homework')">
-                        Посмотреть задания
-                    </button>
-                </div>
-                <div class="course-card">
-                    <h3>Мой прогресс</h3>
-                    <p>Отслеживание вашего прогресса в обучении</p>
-                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('progress')">
-                        Посмотреть прогресс
-                    </button>
-                </div>
-                <div class="course-card">
-                    <h3>Учебные материалы</h3>
-                    <p>Доступ к учебным материалам и ресурсам</p>
-                    <button class="login-btn" style="margin-top: 15px;" onclick="showSection('materials')">
-                        Посмотреть материалы
-                    </button>
-                </div>
-            </div>
-        </section>
+            <!-- Основной контент -->
+            <div class="content-area">
+                <!-- Страница: Обзор -->
+                <div id="dashboard" class="page-section active">
+                    <header class="header">
+                        <div class="header-info">
+                            <h1>Добро пожаловать в кабинет ученика!</h1>
+                            <h2>Обучение и прогресс</h2>
+                            <p class="subtitle">Здесь вы можете просматривать расписание, учебные материалы и проходить тесты</p>
+                        </div>
+                    </header>
 
-        <section class="login-section" id="content-section">
-            <h2>🎯 Начало работы</h2>
-            <div class="login-container">
-                <p>Выберите раздел в меню выше чтобы начать работу.</p>
-                <p>Здесь вы можете управлять своим обучением и отслеживать прогресс.</p>
+                    <!-- Быстрая статистика -->
+                    <section class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <h3>Занятий всего</h3>
+                            <p class="stat-number" id="lessonsCount">0</p>
+                            <p class="stat-description">проведено</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <h3>Доступных материалов</h3>
+                            <p class="stat-number" id="materialsCount">0</p>
+                            <p class="stat-description">документов</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🧪</div>
+                            <h3>Пройдено тестов</h3>
+                            <p class="stat-number" id="testsCount">0</p>
+                            <p class="stat-description">средний балл: <span id="avgScore">-</span>%</p>
+                        </div>
+                    </section>
+
+                    <!-- Быстрый доступ к разделам -->
+                    <section class="quick-access">
+                        <a href="/student-schedule" class="access-card">
+                            <div class="access-card-icon">📅</div>
+                            <h3>Моё расписание</h3>
+                            <p>Просмотр запланированных занятий с репетитором</p>
+                        </a>
+                        <a href="/student-tests" class="access-card">
+                            <div class="access-card-icon">🧪</div>
+                            <h3>Тесты и задания</h3>
+                            <p>Выполнение тестов для проверки знаний</p>
+                        </a>
+                        <a href="/student-materials" class="access-card">
+                            <div class="access-card-icon">📚</div>
+                            <h3>Учебные материалы</h3>
+                            <p>Доступ к учебным материалам и файлам</p>
+                        </a>
+                    </section>
+
+                    <!-- Последняя активность -->
+                    <section class="recent-activity">
+                        <h2 style="color: #88746b; margin-bottom: 20px;">📋 Последняя активность</h2>
+                        <div class="activity-list" id="activityList">
+                            <div class="activity-item">
+                                <div class="activity-icon">📅</div>
+                                <div class="activity-content">
+                                    <strong>Добро пожаловать!</strong>
+                                    <p>Начните работу с просмотра расписания или прохождения тестов</p>
+                                </div>
+                                <div class="activity-time">Сегодня</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-        </section>
+        </div>
     </div>
 
     <script>
-        function showSection(section) {
-            const contentSection = document.getElementById('content-section');
-            const sections = {
-                'schedule': `
-                    <h2>📅 Моё расписание</h2>
-                    <div class="login-container">
-                        <p>Здесь будет ваше расписание занятий</p>
-                        <p>Функционал в разработке...</p>
-                    </div>
-                `,
-                'homework': `
-                    <h2>📝 Домашние задания</h2>
-                    <div class="login-container">
-                        <p>Здесь будут ваши домашние задания</p>
-                        <p>Функционал в разработке...</p>
-                    </div>
-                `,
-                'progress': `
-                    <h2>📊 Мой прогресс</h2>
-                    <div class="login-container">
-                        <p>Здесь будет информация о вашем прогрессе</p>
-                        <p>Функционал в разработке...</p>
-                    </div>
-                `,
-                'materials': `
-                    <h2>📁 Учебные материалы</h2>
-                    <div class="login-container">
-                        <p>Здесь будут учебные материалы</p>
-                        <p>Функционал в разработке...</p>
-                    </div>
-                `
-            };
+        // Функция для выделения активного пункта меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.menu-item');
 
-            contentSection.innerHTML = sections[section] || `
-                <h2>Раздел в разработке</h2>
-                <div class="login-container">
-                    <p>Данный раздел находится в разработке.</p>
-                </div>
-            `;
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Загружаем статистику
+            loadStats();
+        });
+
+        // Загрузка статистики
+        async function loadStats() {
+            try {
+                // Загружаем расписание для подсчета занятий
+                const scheduleResponse = await fetch('/api/schedule');
+                const scheduleData = await scheduleResponse.json();
+                const lessonsCount = scheduleData.schedule ? scheduleData.schedule.length : 0;
+                document.getElementById('lessonsCount').textContent = lessonsCount;
+
+                // Загружаем материалы
+                const materialsResponse = await fetch('/api/materials');
+                const materialsData = await materialsResponse.json();
+                const materialsCount = materialsData.materials ? materialsData.materials.length : 0;
+                document.getElementById('materialsCount').textContent = materialsCount;
+
+                // Тесты (пока заглушка)
+                document.getElementById('testsCount').textContent = '0';
+                document.getElementById('avgScore').textContent = '-';
+
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
         }
 
         // Проверяем авторизацию при загрузке
@@ -118,6 +353,9 @@
                 if (!data.authenticated || data.user.role !== 'student') {
                     window.location.href = '/cabinet';
                 }
+            })
+            .catch(error => {
+                console.error('Ошибка проверки авторизации:', error);
             });
     </script>
 </body>
