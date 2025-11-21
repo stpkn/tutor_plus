@@ -11,12 +11,10 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            padding: 25px;
+            padding: 25px 40px;
             background: linear-gradient(135deg, #FEFCF8, #F5F0E8);
             border-radius: 15px;
             border: 2px solid #88746b;
-            position: relative;
-            overflow: hidden;
         }
 
         .schedule-header::before {
@@ -30,34 +28,47 @@
         }
 
         .date-navigation {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: #FEFCF8;
-            padding: 10px 20px;
-            border-radius: 25px;
-            border: 1px solid #88746b;
-        }
+            position: relative;
 
-        .nav-btn {
-            background: linear-gradient(135deg, #88746b, #6B5B73);
-            color: #FEFCF8;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: bold;
+            /* фиксируем высоту и даём нормальный «воздух» сверху/снизу */
+            height: 58px;             /* можно 56–60 под твой шрифт */
+            padding: 0 64px;          /* слева/справа место под круглые кнопки */
+
+            width: clamp(360px, 40vw, 520px);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+
+            background: #FEFCF8;
+            border: 1px solid #88746b;
+            border-radius: 30px;
+        }
+
+        .nav-btn {
+              position: absolute;
+
+              /* центрируем без translate — не будет сползаний */
+              inset-block: 0;           /* top:0; bottom:0; */
+              margin-block: auto;       /* по вертикали — по центру */
+
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              border: none;
+              background: linear-gradient(135deg, #88746b, #6B5B73);
+              color: #FEFCF8;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.05em;
+              font-weight: 700;
+              transition: background-color .2s ease, box-shadow .2s ease;
         }
 
         .nav-btn:hover {
             background: linear-gradient(135deg, #6B5B73, #88746b);
-            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(136,116,107,.15) inset;
         }
 
         .current-date {
@@ -70,7 +81,10 @@
 
         .schedule-actions {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 20px; /* одинаковый отступ между всеми кнопками */
+            margin-left: 20px; /* зазор от блока даты */
+
         }
 
         .btn-primary {
@@ -372,11 +386,6 @@
                 text-align: center;
             }
 
-            .schedule-actions {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
             .schedule-table {
                 display: block;
                 overflow-x: auto;
@@ -391,7 +400,19 @@
                 justify-content: flex-start;
             }
         }
+        #currentPeriod {
+              white-space: nowrap;
+              line-height: 1;      /* убираем лишнюю высоту строки */
+              font-size: 1.1em;
+              font-weight: 600;
+              color: #88746b;
+              margin: 0;
+              text-align: center;
+        }
+        .nav-left  { left: 10px; }
+        .nav-right { right: 10px; }
     </style>
+
 </head>
 <body>
     <div class="container">
@@ -455,9 +476,9 @@
 
                     <section class="schedule-header">
                         <div class="date-navigation">
-                            <button class="nav-btn" onclick="previousDay()">◀</button>
-                            <div class="current-date" id="currentDate">Понедельник, 20 мая 2024</div>
-                            <button class="nav-btn" onclick="nextDay()">▶</button>
+                            <button class="nav-btn nav-left"  onclick="previousDay()">◀</button>
+                            <h2 id="currentPeriod" class="period-title"></h2>
+                            <button class="nav-btn nav-right" onclick="nextDay()">▶</button>
                         </div>
                         <div class="schedule-actions">
                             <button class="btn-primary" onclick="addLesson()">➕ Добавить занятие</button>
@@ -469,188 +490,18 @@
                     <!-- Большая таблица расписания на день -->
                     <section class="daily-schedule">
                         <table class="schedule-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 120px;">Время</th>
-                                    <th>Занятия</th>
-                                    <th style="width: 150px;">Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Утренние занятия -->
-                                <tr>
-                                    <td class="time-slot">09:00 - 10:30</td>
-                                    <td>
-                                        <div class="lesson-card oge">
-                                            <div class="lesson-header">
-                                                <div class="student-info">
-                                                    <div class="student-avatar">АП</div>
-                                                    <div class="student-details">
-                                                        <h4>Алексей Петров</h4>
-                                                        <p>9 класс • ОГЭ</p>
-                                                    </div>
-                                                </div>
-                                                <span class="lesson-type oge">ОГЭ</span>
-                                            </div>
-                                            <div class="lesson-details">
-                                                <div class="lesson-topic">Алгоритмизация и программирование</div>
-                                                <div class="lesson-description">
-                                                    Решение задач на PascalABC. Работа с массивами и строками.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="lesson-actions">
-                                            <button class="btn-small btn-start" onclick="startLesson(1)">🎬 Начать</button>
-                                            <button class="btn-small btn-edit" onclick="editLesson(1)">✏️</button>
-                                        </div>
-                                    </td>
-                                </tr>
+                          <thead>
+                            <tr>
+                              <th>Время</th>
+                              <th>Занятия</th>
+                              <th>Действия</th>
+                            </tr>
+                          </thead>
 
-                                <tr>
-                                    <td class="time-slot">10:30 - 12:00</td>
-                                    <td>
-                                        <div class="lesson-card ege">
-                                            <div class="lesson-header">
-                                                <div class="student-info">
-                                                    <div class="student-avatar">ЕС</div>
-                                                    <div class="student-details">
-                                                        <h4>Елена Сидорова</h4>
-                                                        <p>11 класс • ЕГЭ</p>
-                                                    </div>
-                                                </div>
-                                                <span class="lesson-type ege">ЕГЭ</span>
-                                            </div>
-                                            <div class="lesson-details">
-                                                <div class="lesson-topic">Задачи на системы счисления</div>
-                                                <div class="lesson-description">
-                                                    Перевод между системами счисления. Решение задач №16 из ЕГЭ.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="lesson-actions">
-                                            <button class="btn-small btn-start" onclick="startLesson(2)">🎬 Начать</button>
-                                            <button class="btn-small btn-edit" onclick="editLesson(2)">✏️</button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Обеденный перерыв -->
-                                <tr>
-                                    <td class="time-slot">12:00 - 13:00</td>
-                                    <td>
-                                        <div class="empty-slot">
-                                            🍽️ Обеденный перерыв
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-
-                                <!-- Дневные занятия -->
-                                <tr>
-                                    <td class="time-slot">13:00 - 14:30</td>
-                                    <td>
-                                        <div class="lesson-card oge">
-                                            <div class="lesson-header">
-                                                <div class="student-info">
-                                                    <div class="student-avatar">ИК</div>
-                                                    <div class="student-details">
-                                                        <h4>Иван Козлов</h4>
-                                                        <p>9 класс • ОГЭ</p>
-                                                    </div>
-                                                </div>
-                                                <span class="lesson-type oge">ОГЭ</span>
-                                            </div>
-                                            <div class="lesson-details">
-                                                <div class="lesson-topic">Базы данных и SQL</div>
-                                                <div class="lesson-description">
-                                                    Основы реляционных баз данных. Простые SQL-запросы.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="lesson-actions">
-                                            <button class="btn-small btn-start" onclick="startLesson(3)">🎬 Начать</button>
-                                            <button class="btn-small btn-edit" onclick="editLesson(3)">✏️</button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="time-slot">14:30 - 16:00</td>
-                                    <td>
-                                        <div class="empty-slot">
-                                            📝 Подготовка материалов
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-
-                                <!-- Вечерние занятия -->
-                                <tr>
-                                    <td class="time-slot">16:00 - 17:30</td>
-                                    <td>
-                                        <div class="lesson-card ege">
-                                            <div class="lesson-header">
-                                                <div class="student-info">
-                                                    <div class="student-avatar">ОН</div>
-                                                    <div class="student-details">
-                                                        <h4>Ольга Новикова</h4>
-                                                        <p>11 класс • ЕГЭ</p>
-                                                    </div>
-                                                </div>
-                                                <span class="lesson-type ege">ЕГЭ</span>
-                                            </div>
-                                            <div class="lesson-details">
-                                                <div class="lesson-topic">Динамическое программирование</div>
-                                                <div class="lesson-description">
-                                                    Решение задач на динамику. Подготовка к сложным заданиям ЕГЭ.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="lesson-actions">
-                                            <button class="btn-small btn-start" onclick="startLesson(4)">🎬 Начать</button>
-                                            <button class="btn-small btn-edit" onclick="editLesson(4)">✏️</button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="time-slot">17:30 - 19:00</td>
-                                    <td>
-                                        <div class="lesson-card oge">
-                                            <div class="lesson-header">
-                                                <div class="student-info">
-                                                    <div class="student-avatar">ДВ</div>
-                                                    <div class="student-details">
-                                                        <h4>Дмитрий Волков</h4>
-                                                        <p>9 класс • ОГЭ</p>
-                                                    </div>
-                                                </div>
-                                                <span class="lesson-type oge">ОГЭ</span>
-                                            </div>
-                                            <div class="lesson-details">
-                                                <div class="lesson-topic">Логика и теория множеств</div>
-                                                <div class="lesson-description">
-                                                    Решение логических задач. Работа с диаграммами Эйлера-Венна.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="lesson-actions">
-                                            <button class="btn-small btn-start" onclick="startLesson(5)">🎬 Начать</button>
-                                            <button class="btn-small btn-edit" onclick="editLesson(5)">✏️</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
+                          <!-- сюда JS рисует строки -->
+                          <tbody id="schedule-body">
+                            <tr><td colspan="3" style="padding:16px;">Загрузка…</td></tr>
+                          </tbody>
                         </table>
                     </section>
 
@@ -682,79 +533,7 @@
         </div>
     </div>
 
-    <script>
-        // Функция для выделения активного пункта меню
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const menuItems = document.querySelectorAll('.menu-item');
+<script src="/timetable.js"></script>
 
-            menuItems.forEach(item => {
-                const link = item.querySelector('a');
-                if (link && link.getAttribute('href') === currentPath) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            // Установка текущей даты
-            updateCurrentDate();
-        });
-
-        // Навигация по датам
-        let currentDate = new Date();
-
-        function updateCurrentDate() {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            document.getElementById('currentDate').textContent = 
-                currentDate.toLocaleDateString('ru-RU', options);
-        }
-
-        function previousDay() {
-            currentDate.setDate(currentDate.getDate() - 1);
-            updateCurrentDate();
-            // Здесь будет загрузка расписания на предыдущий день
-        }
-
-        function nextDay() {
-            currentDate.setDate(currentDate.getDate() + 1);
-            updateCurrentDate();
-            // Здесь будет загрузка расписания на следующий день
-        }
-
-        // Функции для работы с занятиями
-        function addLesson() {
-            alert('Открытие формы добавления нового занятия');
-            // Здесь будет логика открытия модального окна
-        }
-
-        function startLesson(lessonId) {
-            if (confirm('Начать занятие?')) {
-                alert(`Занятие #${lessonId} начато!`);
-                // Здесь будет логика начала занятия
-            }
-        }
-
-        function editLesson(lessonId) {
-            alert(`Редактирование занятия #${lessonId}`);
-            // Здесь будет логика редактирования занятия
-        }
-
-        function showWeekView() {
-            alert('Переход к просмотру расписания на неделю');
-            // Здесь будет логика перехода к недельному виду
-        }
-
-        function showRecurring() {
-            alert('Настройка повторяющихся занятий');
-            // Здесь будет логика настройки повторяющихся занятий
-        }
-    </script>
 </body>
 </html>
-[file content end]

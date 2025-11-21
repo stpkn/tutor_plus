@@ -4,8 +4,6 @@ import uuid
 from werkzeug.utils import secure_filename
 from database.database import Database
 from services.auth_service import AuthService
-from llm.llm_client import generate_test_from_text
-
 # Инициализация БД
 db = Database('database/tutoring.db')
 auth_service = AuthService(db)
@@ -18,6 +16,10 @@ db.ensure_tutor_user()
 
 app = Flask(__name__)
 app.secret_key = 'tutoring-secret-key-2024'
+@app.route('/timetable.js')
+def serve_timetable_js():
+    return send_file('timetable.js', mimetype='application/javascript')
+
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
@@ -188,8 +190,20 @@ def api_delete_student(student_id):
         if student['created_by'] != session['user_id']:
             return jsonify({'success': False, 'message': 'Доступ запрещен'}), 403
 
-        # Удаляем ученика (или помечаем как неактивного)
+        # Помечаем ученика как неактивного
         cursor.execute("UPDATE users SET is_active = 0 WHERE id = ?", (student_id,))
+
+        # Снимаем активные слоты расписания ученика
+        # (вариант А — «мягко»: пометить как cancelled)
+        cursor.execute("""
+            UPDATE schedule
+               SET status = 'cancelled'
+             WHERE student_id = ? AND status = 'active'
+        """, (student_id,))
+
+        # Если хочешь прямо удалять слоты, вместо UPDATE можно:
+        # cursor.execute("DELETE FROM schedule WHERE student_id = ?", (student_id,))
+
         connection.commit()
         connection.close()
 

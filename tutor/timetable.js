@@ -1,182 +1,116 @@
-// schedule.js
+// timetable.js — динамическое расписание (под твои кнопки и верстку)
 
-// Навигация между страницами
-function showPage(pageId) {
-    document.querySelectorAll('.page-section').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    event.target.classList.add('active');
-}
-
-// Управление представлениями расписания
-function changeView(viewType) {
-    // Скрыть все представления
-    document.querySelectorAll('.schedule-view').forEach(view => {
-        view.classList.remove('active');
-    });
-
-    // Убрать активный класс у всех кнопок
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Показать выбранное представление
-    document.getElementById(viewType + 'View').classList.add('active');
-
-    // Добавить активный класс к нажатой кнопке
-    event.target.classList.add('active');
-
-    // Обновить заголовок периода
-    updatePeriodTitle(viewType);
-}
-
-// Навигация по датам
 let currentDate = new Date();
+const DOW = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+const RU_DOW = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
 
-function previousPeriod() {
-    currentDate.setDate(currentDate.getDate() - 1);
-    updatePeriodTitle(getCurrentView());
+function pad(n){ return n.toString().padStart(2,'0'); }
+const MONTHS_GEN = [
+  'января','февраля','марта','апреля','мая','июня',
+  'июля','августа','сентября','октября','ноября','декабря'
+];
+
+function fmtDateTitle(d){
+  const weekday = RU_DOW[(d.getDay()+6)%7].toLowerCase(); // понедельник, вторник...
+  const day = d.getDate();                                // без ведущего нуля
+  const month = MONTHS_GEN[d.getMonth()];                 // РОДИТЕЛЬНЫЙ падеж
+  const year = d.getFullYear();
+  return `${weekday}, ${day} ${month} ${year} г.`;
+}
+function toDowName(d){
+  // JS: Sunday=0..Saturday=6 → monday..sunday
+  const js = d.getDay();
+  return DOW[(js + 6) % 7];
 }
 
-function nextPeriod() {
-    currentDate.setDate(currentDate.getDate() + 1);
-    updatePeriodTitle(getCurrentView());
-}
+async function loadScheduleForCurrentDay(){
+  // заголовок с датой
+  const titleEl = document.getElementById('currentPeriod');
+  if (titleEl) titleEl.textContent = fmtDateTitle(currentDate);
 
-// Получить текущее активное представление
-function getCurrentView() {
-    const activeView = document.querySelector('.schedule-view.active');
-    if (activeView) {
-        return activeView.id.replace('View', '');
-    }
-    return 'day';
-}
+  // таблица
+  const body = document.getElementById('schedule-body');
+  if (!body) return;
+  body.innerHTML = `<tr><td colspan="3" style="padding:16px;">Загрузка…</td></tr>`;
 
-// Обновить заголовок периода
-function updatePeriodTitle(viewType) {
-    const periodElement = document.getElementById('currentPeriod');
-    const options = {
-        day: 'numeric',
-        month: 'long'
-    };
+  try {
+    const res = await fetch('/api/schedule', {credentials:'same-origin'});
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const all = data.schedule || [];
 
-    switch(viewType) {
-        case 'day':
-            periodElement.textContent = currentDate.toLocaleDateString('ru-RU', options);
-            break;
-        case 'week':
-            const weekStart = new Date(currentDate);
-            weekStart.setDate(currentDate.getDate() - currentDate.getDay() + 1);
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
+    const dow = toDowName(currentDate);
+    const items = all
+      .filter(s => (s.day_of_week || '').toLowerCase() === dow)
+      .sort((a,b) => (a.start_time > b.start_time ? 1 : -1));
 
-            const weekStartStr = weekStart.toLocaleDateString('ru-RU', { day: 'numeric', month: 'numeric' });
-            const weekEndStr = weekEnd.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-            periodElement.textContent = `Неделя ${weekStartStr}-${weekEndStr}`;
-            break;
-        case 'month':
-            const monthName = currentDate.toLocaleDateString('ru-RU', { month: 'long' });
-            const year = currentDate.getFullYear();
-            periodElement.textContent = `${monthName} ${year}`;
-            break;
-    }
-}
-
-// Функции для занятий
-function startLesson(lessonId, studentName) {
-    if (confirm(`Начать урок с учеником ${studentName}?`)) {
-        alert(`Урок #${lessonId} начат с ${studentName}`);
-        // Здесь будет логика начала урока
-    }
-}
-
-function startAllLessons() {
-    if (confirm('Начать уроки со всеми учениками?')) {
-        alert('Все уроки начаты!');
-        // Логика начала всех уроков
-    }
-}
-
-function scheduleAllLessons() {
-    if (confirm('Запланировать занятия для всех учеников?')) {
-        alert('Все занятия запланированы!');
-        // Логика планирования занятий
-    }
-}
-
-function editLesson(lessonId) {
-    alert(`Редактирование урока #${lessonId}`);
-    // Логика редактирования урока
-}
-
-function showCreateLessonForm() {
-    document.getElementById('createLessonModal').style.display = 'block';
-}
-
-function closeCreateLessonForm() {
-    document.getElementById('createLessonModal').style.display = 'none';
-}
-
-function showWeekView() {
-    changeView('week');
-}
-
-function showRecurringForm() {
-    alert('Настройка повторяющихся занятий');
-    // Логика настройки повторяющихся занятий
-}
-
-// Инициализация после загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
-    // Обработка формы создания занятия
-    const createLessonForm = document.querySelector('.create-lesson-form');
-    if (createLessonForm) {
-        createLessonForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const student = formData.get('student');
-            const subject = formData.get('subject');
-            const topic = formData.get('topic');
-            const datetime = formData.get('datetime');
-
-            alert(`Занятие создано!\nУченик: ${student}\nПредмет: ${subject}\nТема: ${topic}\nВремя: ${datetime}`);
-            closeCreateLessonForm();
-            this.reset();
-        });
+    if (items.length === 0) {
+      body.innerHTML = `<tr><td colspan="3" style="padding:16px;">Нет занятий на выбранный день</td></tr>`;
+      return;
     }
 
-    // Закрытие модального окна при клике вне его
-    window.addEventListener('click', function(e) {
-        const modal = document.getElementById('createLessonModal');
-        if (e.target === modal) {
-            closeCreateLessonForm();
-        }
-    });
+    body.innerHTML = items.map(s => {
+      const time = `${(s.start_time||'').slice(0,5)} — ${(s.end_time||'').slice(0,5)}`;
+      const fullName = [s.student_name, s.student_last_name].filter(Boolean).join(' ') || 'Ученик';
+      const topic = s.topic_title || 'Занятие';
+      const exam = (s.exam_type || '').toLowerCase(); // если вернется с бэка
 
-    // Закрытие модального окна по ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeCreateLessonForm();
-        }
-    });
+      // классы и верстка под твой стиль
+      return `
+        <tr class="schedule-row">
+          <td class="time-slot">${time}</td>
+          <td>
+            <div class="lesson-card ${exam}">
+              <div class="lesson-header">
+                <div class="student-info">
+                  <div class="student-avatar">${
+                    fullName ? fullName.split(' ').map(w => w[0]||'').join('').slice(0,2).toUpperCase() : 'У'
+                  }</div>
+                  <div class="student-details">
+                    <h4>${fullName}</h4>
+                    <p>${(s.grade ? s.grade + ' класс • ' : '') + (s.exam_type ? s.exam_type.toUpperCase() : '')}</p>
+                  </div>
+                </div>
+                <span class="lesson-type ${exam}">${s.exam_type ? s.exam_type.toUpperCase() : ''}</span>
+              </div>
+              <div class="lesson-details">
+                <div class="lesson-topic">${topic}</div>
+                <div class="lesson-description">${s.lesson_link ? `Ссылка: ${s.lesson_link}` : ''}</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="btn-small btn-start">Начать</button>
+                <button class="btn-small btn-edit">✏️</button>
+              </div>
+            </div>
+          </td>
+          <td class="actions-col">
+            <!-- при желании продублировать кнопки -->
+          </td>
+        </tr>
+      `;
+    }).join('');
 
-    // Инициализация текущей даты
-    updatePeriodTitle('day');
+  } catch (e) {
+    console.error('Ошибка загрузки расписания:', e);
+    body.innerHTML = `<tr><td colspan="3" style="padding:16px;">Не удалось загрузить расписание</td></tr>`;
+  }
+}
 
-    // Проверка авторизации (если нужно)
-    fetch('/api/check-auth')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.authenticated) {
-                window.location.href = '/cabinet';
-            }
-        })
-        .catch(error => {
-            console.log('Ошибка проверки авторизации:', error);
-        });
+// Эти функции вызываются из HTML через onclick
+window.previousDay = function(){
+  currentDate.setDate(currentDate.getDate() - 1);
+  loadScheduleForCurrentDay();
+}
+window.nextDay = function(){
+  currentDate.setDate(currentDate.getDate() + 1);
+  loadScheduleForCurrentDay();
+}
+
+// Первичная загрузка (и защита от неавторизованных)
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/api/check-auth')
+    .then(r => r.json())
+    .then(j => j.authenticated ? loadScheduleForCurrentDay()
+                                : window.location.assign('/cabinet'))
+    .catch(() => loadScheduleForCurrentDay());
 });
